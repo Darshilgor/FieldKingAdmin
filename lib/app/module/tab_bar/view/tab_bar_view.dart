@@ -1,3 +1,7 @@
+import 'package:field_king_admin/app/module/chat/view/chat_view.dart';
+import 'package:field_king_admin/app/module/home_screen/view/home_screen_view.dart';
+import 'package:field_king_admin/app/module/order_list/view/order_list_view.dart';
+import 'package:field_king_admin/app/module/profile/view/profile_view.dart';
 import 'package:field_king_admin/app/module/tab_bar/controller/tab_bar_controller.dart';
 import 'package:field_king_admin/packages/config.dart';
 import 'package:field_king_admin/packages/screen.dart';
@@ -8,8 +12,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
 
-class TabBarScreenView extends StatelessWidget {
-  TabBarScreenView({super.key});
+class TabBarView extends StatelessWidget {
+  TabBarView({super.key});
 
   final controller = Get.put<TabBarController>(TabBarController());
 
@@ -21,16 +25,16 @@ class TabBarScreenView extends StatelessWidget {
         statusBarIconBrightness: Brightness.light,
       ),
       child: Obx(
-            () => Scaffold(
+        () => Scaffold(
           key: controller.tabBarKey,
           extendBody: true,
-          drawer: _buildDrawer(context),
+          // drawer: _buildDrawer(context),
           body: IndexedStack(
             index: controller.currentIndex.value,
             children: [
+              OrderListView(),
               HomeScreenView(),
               ChatView(),
-              // CartView(),
               ProfileView(),
             ],
           ),
@@ -73,31 +77,32 @@ class TabBarScreenView extends StatelessWidget {
                           top: 10,
                         ),
                         child: Text(
-                          'Home',
+                          'Order List',
                           style: controller.currentIndex.value == 0
                               ? TextStyle().semiBold18.textColor(
-                            AppColor.blackColor,
-                          )
+                                    AppColor.blackColor,
+                                  )
                               : TextStyle().medium16.textColor(
-                            AppColor.blackColor,
-                          ),
+                                    AppColor.blackColor,
+                                  ),
                         ),
                       ),
                     ),
                   ],
                 ),
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Visibility(
                       visible: controller.currentIndex.value == 1,
                       child: Padding(
                         padding: const EdgeInsets.only(
-                          bottom: 2,
+                          bottom: 5,
                         ),
                         child: SvgPicture.asset(
-                          Assets.chat,
-                          width: 27,
-                          height: 27,
+                          Assets.home,
+                          width: 25,
+                          height: 25,
                         ),
                       ),
                     ),
@@ -113,14 +118,54 @@ class TabBarScreenView extends StatelessWidget {
                           top: 10,
                         ),
                         child: Text(
-                          'Chat',
+                          'Home',
                           style: controller.currentIndex.value == 1
                               ? TextStyle().semiBold18.textColor(
-                            AppColor.blackColor,
-                          )
+                                    AppColor.blackColor,
+                                  )
                               : TextStyle().medium16.textColor(
-                            AppColor.blackColor,
-                          ),
+                                    AppColor.blackColor,
+                                  ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Visibility(
+                      visible: controller.currentIndex.value == 2,
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                          bottom: 2,
+                        ),
+                        child: SvgPicture.asset(
+                          Assets.chat,
+                          width: 27,
+                          height: 27,
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        controller.currentIndex.value = 2;
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                          left: 5,
+                          right: 10,
+                          bottom: 10,
+                          top: 10,
+                        ),
+                        child: Text(
+                          'Chat',
+                          style: controller.currentIndex.value == 2
+                              ? TextStyle().semiBold18.textColor(
+                                    AppColor.blackColor,
+                                  )
+                              : TextStyle().medium16.textColor(
+                                    AppColor.blackColor,
+                                  ),
                         ),
                       ),
                     ),
@@ -169,7 +214,7 @@ class TabBarScreenView extends StatelessWidget {
                 Row(
                   children: [
                     Visibility(
-                      visible: controller.currentIndex.value == 2,
+                      visible: controller.currentIndex.value == 3,
                       child: SvgPicture.asset(
                         Assets.profile,
                         width: 27,
@@ -178,7 +223,7 @@ class TabBarScreenView extends StatelessWidget {
                     ),
                     GestureDetector(
                       onTap: () {
-                        controller.currentIndex.value = 2;
+                        controller.currentIndex.value = 3;
                       },
                       child: Padding(
                         padding: const EdgeInsets.only(
@@ -189,13 +234,13 @@ class TabBarScreenView extends StatelessWidget {
                         ),
                         child: Text(
                           'Profile',
-                          style: controller.currentIndex.value == 2
+                          style: controller.currentIndex.value == 3
                               ? TextStyle().semiBold18.textColor(
-                            AppColor.blackColor,
-                          )
+                                    AppColor.blackColor,
+                                  )
                               : TextStyle().medium16.textColor(
-                            AppColor.blackColor,
-                          ),
+                                    AppColor.blackColor,
+                                  ),
                         ),
                       ),
                     ),
@@ -209,34 +254,34 @@ class TabBarScreenView extends StatelessWidget {
     );
   }
 
-  // SalomonBottomBarItem _buildSalomonBottomBarItem(
-  //     {required String iconPath, title}) {
-  //   return SalomonBottomBarItem(
-  //     icon: SvgPicture.asset(
-  //       iconPath,
-  //       colorFilter: ColorFilter.mode(
-  //         blackWhite(),
-  //         BlendMode.srcIn,
-  //       ),
-  //     ),
-  //     title: Text(
-  //       title,
-  //       style: textStyle600(
-  //         fontSize: 12,
-  //         color: blackWhite(isOpposite: true),
-  //       ),
-  //     ),
-  //     selectedColor: primaryBlackWhite(),
-  //     activeIcon: SvgPicture.asset(
-  //       iconPath,
-  //       colorFilter: ColorFilter.mode(
-  //         blackWhite(isOpposite: true),
-  //         BlendMode.srcIn,
-  //       ),
-  //     ),
-  //   );
-  // }
-
+// SalomonBottomBarItem _buildSalomonBottomBarItem(
+//     {required String iconPath, title}) {
+//   return SalomonBottomBarItem(
+//     icon: SvgPicture.asset(
+//       iconPath,
+//       colorFilter: ColorFilter.mode(
+//         blackWhite(),
+//         BlendMode.srcIn,
+//       ),
+//     ),
+//     title: Text(
+//       title,
+//       style: textStyle600(
+//         fontSize: 12,
+//         color: blackWhite(isOpposite: true),
+//       ),
+//     ),
+//     selectedColor: primaryBlackWhite(),
+//     activeIcon: SvgPicture.asset(
+//       iconPath,
+//       colorFilter: ColorFilter.mode(
+//         blackWhite(isOpposite: true),
+//         BlendMode.srcIn,
+//       ),
+//     ),
+//   );
+// }
+/*
   Theme _buildDrawer(BuildContext context) {
     return Theme(
       data: ThemeData(useMaterial3: false),
@@ -281,5 +326,5 @@ class TabBarScreenView extends StatelessWidget {
         ),
       ),
     );
-  }
+  }*/
 }

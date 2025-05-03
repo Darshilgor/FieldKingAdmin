@@ -91,4 +91,33 @@ class FirebaseFirestoreService {
     await documentref.update({'userId': documentref.id});
     Preference.userId = documentref.id;
   }
+
+  static getOrderList() {}
+
+
+
+  /// update profile.
+  static Future<void> updateProfile({
+    String? profileImage,
+    String? firstName,
+    String? lastName,
+    String? brandName,
+    String? phoneNumber,
+  }) async {
+    await firebaseFirestore.collection('Users').doc(Preference.userId).update({
+      'profilePhoto': profileImage,
+      'firstName': firstName,
+      'lastName': lastName,
+      'brandName': brandName,
+      'phoneNo': phoneNumber,
+    }).then(
+          (value) {
+        Preference.firstName = firstName;
+        Preference.lastName = lastName;
+        Preference.brandName = brandName;
+        Preference.phoneNumber = phoneNumber;
+        Preference.profileImage = profileImage;
+      },
+    );
+  }
 }

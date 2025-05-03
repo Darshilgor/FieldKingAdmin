@@ -14,6 +14,8 @@ class Preference {
   static const lastNameKey = "lastNameKey";
   static const addresssKey = "addressKey";
   static const userTypeKey = "userTypeKey";
+  static const profileImageKey = 'profileImageKey';
+
 
 
 
@@ -75,4 +77,9 @@ class Preference {
   static String? get userType => box?.read<String>(userTypeKey);
   static set userType(String? type) => box?.write(userTypeKey, type);
 
+
+  // profile Photo.
+  static String? get profileImage => box?.read<String>(profileImageKey);
+  static set profileImage(String? profileImage) =>
+      box?.write(profileImageKey, profileImage);
 }

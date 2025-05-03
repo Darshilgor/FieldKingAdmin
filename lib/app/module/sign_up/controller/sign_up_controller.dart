@@ -52,7 +52,7 @@ class SignUpController extends GetxController {
         Preference.isLogin = true;
         isSubmitBtnLoading.value = false;
         Get.offAllNamed(
-          Routes.tabBarScreen,
+          Routes.tabBarView,
         );
       },
     );

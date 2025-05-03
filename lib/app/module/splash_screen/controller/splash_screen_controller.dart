@@ -17,7 +17,7 @@ class SplashScreenController extends GetxController {
       () async {
         Preference.isLogin == true
             ? Get.offAllNamed(
-                Routes.tabBarScreen,
+                Routes.tabBarView,
               )
             : Get.offAllNamed(
                 Routes.login,
