@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "285996212161",
+    "project_id": "field-king-515db",
+    "storage_bucket": "field-king-515db.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:285996212161:android:52c07d8e60672cb36ed940",
+        "android_client_info": {
+          "package_name": "com.example.field_king"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvbTH4BEEb4ZSMWksFNtVISRlMKA-_b_Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:285996212161:android:ef567740582a79636ed940",
+        "android_client_info": {
+          "package_name": "com.example.field_king_admin"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvbTH4BEEb4ZSMWksFNtVISRlMKA-_b_Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
