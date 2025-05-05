@@ -92,9 +92,9 @@ class FirebaseFirestoreService {
     Preference.userId = documentref.id;
   }
 
-  static getOrderList() {}
-
-
+  static getOrderList() {
+    return firebaseFirestore.collection('OrderList').snapshots();
+  }
 
   /// update profile.
   static Future<void> updateProfile({
@@ -111,7 +111,7 @@ class FirebaseFirestoreService {
       'brandName': brandName,
       'phoneNo': phoneNumber,
     }).then(
-          (value) {
+      (value) {
         Preference.firstName = firstName;
         Preference.lastName = lastName;
         Preference.brandName = brandName;
@@ -119,5 +119,108 @@ class FirebaseFirestoreService {
         Preference.profileImage = profileImage;
       },
     );
+  }
+
+  static updateOrderStatus(
+      {String? status,
+      String? subOrderId,
+      String? userId,
+      String? mainOrderId,
+      String? userOrderCollectionId}) async {
+    /// update oreder list collection.
+    final docRef =
+        await firebaseFirestore.collection('OrderList').doc(mainOrderId);
+    final docSnapshot = await docRef.get();
+
+    if (docSnapshot.exists) {
+      List<dynamic> subOrders = docSnapshot.data()?['order'] ?? [];
+
+      for (var i = 0; i < subOrders.length; i++) {
+        if (subOrders[i]['subOrderId'] == subOrderId) {
+          subOrders[i]['orderStatus'] = status;
+        }
+      }
+      await docRef.update(
+        {
+          'order': subOrders,
+        },
+      );
+    }
+
+    /// update particular user order collection.
+    final orderCollectionRef = await firebaseFirestore
+        .collection('Users')
+        .doc(userId)
+        .collection('Order')
+        .doc(userOrderCollectionId);
+
+    final orderCollectionRefSnapshot = await orderCollectionRef.get();
+
+    if (orderCollectionRefSnapshot.exists) {
+      List<dynamic> listOrderCollection = docSnapshot.data()?['order'] ?? [];
+
+      for (var i = 0; i < listOrderCollection.length; i++) {
+        if (listOrderCollection[i]['subOrderId'] == subOrderId) {
+          listOrderCollection[i]['orderStatus'] = status;
+        }
+      }
+      await orderCollectionRef.update(
+        {
+          'order': listOrderCollection,
+        },
+      );
+    }
+    return;
+  }
+
+  static updateAllSubOrderStatus({
+    String? userId,
+    String? orderListId,
+    String? orderCollectionId,
+    String? status,
+  }) async {
+    /// update order list collection.
+    final ref =
+        await firebaseFirestore.collection('OrderList').doc(orderListId);
+
+    final documentReference = await ref.get();
+
+    if (documentReference.exists) {
+      List<dynamic> listOrderCollection =
+          documentReference.data()?['order'] ?? [];
+
+      listOrderCollection.forEach(
+        (e) {
+          e['orderStatus'] = status;
+        },
+      );
+      ref.update(
+        {
+          'order': listOrderCollection,
+        },
+      );
+    }
+
+    /// update user order collection status.
+    final orderCollectionRef = await firebaseFirestore
+        .collection('Users')
+        .doc(userId)
+        .collection('Order')
+        .doc(orderCollectionId);
+
+    final orderCollectionSnapshot = await orderCollectionRef.get();
+    if (orderCollectionSnapshot.exists) {
+      List<dynamic> orderList = orderCollectionSnapshot.data()?['order'];
+
+      orderList.forEach((e) {
+        e['orderStatus'] = status;
+      });
+      orderCollectionRef.update(
+        {
+          'order': orderList,
+        },
+      );
+    }
+    return;
   }
 }

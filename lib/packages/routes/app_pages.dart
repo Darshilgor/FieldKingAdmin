@@ -1,5 +1,6 @@
 import 'package:field_king_admin/app/module/edit_profile/view/edit_profile_view.dart';
 import 'package:field_king_admin/app/module/login/view/login_view.dart';
+import 'package:field_king_admin/app/module/order_details/view/order_details_view.dart';
 import 'package:field_king_admin/app/module/profile/view/profile_view.dart';
 import 'package:field_king_admin/app/module/sign_up/view/sign_up_view.dart';
 import 'package:field_king_admin/app/module/splash_screen/view/splash_screen_view.dart';
@@ -32,6 +33,9 @@ class AppPages {
     ),GetPage(
       name: _Paths.tabBarView,
       page: () => TabBarView(),
+    ),GetPage(
+      name: _Paths.orderDetailsView,
+      page: () => OrderDetailsView(),
     ),
   ];
 }
