@@ -223,4 +223,116 @@ class FirebaseFirestoreService {
     }
     return;
   }
+
+  static updateOrderListStatus({String? orderId}) async {
+    await firebaseFirestore.collection('OrderList').doc(orderId).update(
+      {
+        'isOrderDelivered': true,
+      },
+    );
+  }
+
+  static getUserList() {
+    return firebaseFirestore
+        .collection('Users')
+        .where(
+          'userType',
+          isEqualTo: 'User',
+        )
+        .snapshots();
+  }
+
+  static getChatHistory({String? userId, String? adminId}) {
+    try {
+      String chatId = '$adminId$userId';
+
+      return firebaseFirestore
+          .collection('Chats')
+          .doc(chatId)
+          .collection('Messages')
+          .orderBy('timestamp', descending: false)
+          .snapshots();
+    } catch (e) {
+      print("Error fetching chat history: $e");
+      return const Stream.empty();
+    }
+  }
+
+  static addChatWelcomeMessage({
+    String? adminId,
+    String? userId,
+  }) async {
+    String chatId = '$adminId$userId';
+    DocumentReference document = await firebaseFirestore
+        .collection('Chats')
+        .doc(chatId)
+        .collection('Messages')
+        .add(
+      {
+        'isRead': false,
+        'mediaUrl': '',
+        'message': 'Welcome to Field King',
+        'messageType': 'text',
+        'receiverId': userId,
+        'senderId': adminId,
+        'timestamp': DateTime.now(),
+      },
+    );
+    await document.update(
+      {
+        'id': document.id,
+      },
+    );
+    DocumentReference secondDocument = await firebaseFirestore
+        .collection('Chats')
+        .doc(chatId)
+        .collection('Messages')
+        .add(
+      {
+        'isRead': false,
+        'mediaUrl': '',
+        'message': 'How can we help you!',
+        'messageType': 'text',
+        'receiverId': userId,
+        'senderId': adminId,
+        'timestamp': DateTime.now(),
+      },
+    );
+    await secondDocument.update(
+      {
+        'id': secondDocument.id,
+      },
+    );
+  }
+
+  static sendMessage({
+    String? adminId,
+    String? userId,
+    String? message,
+    String? messageType,
+    bool? senderIsAdmin = false,
+  }) async {
+    String chatId = '$adminId$userId';
+
+    DocumentReference document = await firebaseFirestore
+        .collection('Chats')
+        .doc(chatId)
+        .collection('Messages')
+        .add(
+      {
+        'isRead': false,
+        'mediaUrl': '',
+        'message': message,
+        'messageType': messageType,
+        'receiverId': userId,
+        'senderId': adminId,
+        'timestamp': DateTime.now(),
+      },
+    );
+    await document.update(
+      {
+        'id': document.id,
+      },
+    );
+  }
 }

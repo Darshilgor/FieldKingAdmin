@@ -10,6 +10,7 @@ abstract class Routes {
   static const editProfile = _Paths.editProfile;
   static const tabBarView = _Paths.tabBarView;
   static const orderDetailsView = _Paths.orderDetailsView;
+  static const chatScreenView = _Paths.chatScreenView;
 
 }
 
@@ -23,5 +24,6 @@ abstract class _Paths {
   static const editProfile = '/edit-profile';
   static const tabBarView = '/tab-bar-view';
   static const orderDetailsView = '/order-details-view';
+  static const chatScreenView = '/chat-screen-view';
 
 }

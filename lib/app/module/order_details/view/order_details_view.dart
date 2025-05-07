@@ -235,292 +235,365 @@ class OrderDetailsView extends StatelessWidget {
               ),
             ),
             Gap(10),
-           Obx(()=> Column(
-             crossAxisAlignment: CrossAxisAlignment.start,
-             children: List.generate(
-               controller.order.value?['order'].length ?? 0,
-                   (index) {
-                 final item = controller.order.value?['order'][index];
-                 return Padding(
-                   padding: const EdgeInsets.symmetric(
-                     vertical: 10,
-                     horizontal: 20,
-                   ),
-                   child: Container(
-                     width: Get.width,
-                     decoration: ContainerDecoration.decoration(),
-                     padding: EdgeInsets.symmetric(
-                       horizontal: 20,
-                       vertical: 10,
-                     ),
-                     child: Column(
-                       crossAxisAlignment: CrossAxisAlignment.start,
-                       children: [
-                         Text(
-                           '${item?['size']} ${item?['type'].toString().capitalize}${(item?['type'] == 'flat' && item?['size'] != '1 MM') ? '(${item?['flat']})' : ''} Cable',
-                         ),
-                         Row(
-                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                           children: [
-                             Text('Sub Order Id : '),
-                             Text(item['subOrderId']),
-                           ],
-                         ),
-                         Row(
-                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                           children: [
-                             Text('Gej : '),
-                             Text(item['gej']),
-                           ],
-                         ),
-                         Visibility(
-                           visible: item['isWithGST'] != 'With GST',
-                           child: Row(
-                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                             children: [
-                               Text('Price : '),
-                               Text(item['PPMOO1']),
-                             ],
-                           ),
-                         ),
-                         Visibility(
-                           visible: item?['isWithGST'] == 'With GST' ||
-                               item?['isWithGST'] == '50%',
-                           child: Row(
-                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                             children: [
-                               Text('GST Price : '),
-                               Text(item['PPMOO2']),
-                             ],
-                           ),
-                         ),
-                         Row(
-                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                           children: [
-                             Text('Order Type : '),
-                             Text(item['isWithGST']),
-                           ],
-                         ),
-                         Row(
-                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                           children: [
-                             Text('Order Status : '),
-                             Text(item['orderStatus']),
-                           ],
-                         ),
-                         Row(
-                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                           children: [
-                             Text('Order Meter : '),
-                             Text(item['totalMeter']),
-                           ],
-                         ),
-                         Row(
-                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                           children: [
-                             Text('Order Amount : '),
-                             Text(item['totalAmount']),
-                           ],
-                         ),
-                         Gap(20),
-                         CommonAppButton(
-                           text: 'Update Order Status',
-                           buttonColor: AppColor.whiteColor,
-                           isBorder: true,
-                           textColor: AppColor.blackColor,
-                           buttonType: ButtonType.enable,
-                           onTap: () {
-                             showModalBottomSheet(
-                               context: context,
-                               shape: RoundedRectangleBorder(
-                                 borderRadius: BorderRadius.vertical(
-                                     top: Radius.circular(16)),
-                               ),
-                               builder: (context) {
-                                 return Padding(
-                                   padding: const EdgeInsets.symmetric(
-                                     vertical: 20,
-                                     horizontal: 20,
-                                   ),
-                                   child: Container(
-                                     width: Get.width,
-                                     child: Column(
-                                       mainAxisSize: MainAxisSize.min,
-                                       crossAxisAlignment:
-                                       CrossAxisAlignment.start,
-                                       children: [
-                                         Text(
-                                           'Update Order Status',
-                                           style: TextStyle(
-                                             fontSize: 20,
-                                             color: AppColor.blackColor,
-                                           ),
-                                         ),
-                                         Gap(10),
-                                         GestureDetector(
-                                           onTap: () {
-                                             if (item['orderStatus'] !=
-                                                 'Pending') {
-                                               controller.updateStatus(
-                                                 status: 'Pending',
-                                                 userId: controller
-                                                     .order.value?['userDetails']
-                                                 ['userId'],
-                                                 subOrderId:
-                                                 item['subOrderId'],
-                                                 mainOrderId: controller
-                                                     .order.value?['orderListId'],
-                                                 userOrderCollectionId:
-                                                 controller
-                                                     .order.value?['orderId'],
-                                                 index: index,
-                                               );
-                                             }
-                                           },
-                                           child: Container(
-                                             padding: EdgeInsets.symmetric(
-                                               vertical: 10,
-                                             ),
-                                             width: Get.width,
-                                             child: Text(
-                                               'Pending',
-                                               style: TextStyle(
-                                                 fontSize: 14,
-                                                 color: item['orderStatus'] ==
-                                                     'Pending'
-                                                     ? Colors.grey
-                                                     : AppColor.blackColor,
-                                               ),
-                                             ),
-                                           ),
-                                         ),
-                                         GestureDetector(
-                                           onTap: () {
-                                             if (item['orderStatus'] !=
-                                                 'In Progress') {
-                                               controller.updateStatus(
-                                                 status: 'In Progress',
-                                                 userId: controller
-                                                     .order.value?['userDetails']
-                                                 ['userId'],
-                                                 subOrderId:
-                                                 item['subOrderId'],
-                                                 mainOrderId: controller
-                                                     .order.value?['orderListId'],
-                                                 userOrderCollectionId:
-                                                 controller
-                                                     .order.value?['orderId'],
-                                                 index: index,
-                                               );
-                                             }
-                                           },
-                                           child: Container(
-                                             padding: EdgeInsets.symmetric(
-                                               vertical: 10,
-                                             ),
-                                             width: Get.width,
-                                             child: Text(
-                                               'In Progress',
-                                               style: TextStyle(
-                                                 fontSize: 14,
-                                                 color: item['orderStatus'] ==
-                                                     'In Progress'
-                                                     ? Colors.grey
-                                                     : AppColor.blackColor,
-                                               ),
-                                             ),
-                                           ),
-                                         ),
-                                         GestureDetector(
-                                           onTap: () {
-                                             if (item['orderStatus'] !=
-                                                 'Production Done') {
-                                               controller.updateStatus(
-                                                 status: 'Production Done',
-                                                 userId: controller
-                                                     .order.value?['userDetails']
-                                                 ['userId'],
-                                                 subOrderId:
-                                                 item['subOrderId'],
-                                                 mainOrderId: controller
-                                                     .order.value?['orderListId'],
-                                                 userOrderCollectionId:
-                                                 controller
-                                                     .order.value?['orderId'],
-                                                 index: index,
-                                               );
-                                             }
-                                           },
-                                           child: Container(
-                                             padding: EdgeInsets.symmetric(
-                                               vertical: 10,
-                                             ),
-                                             width: Get.width,
-                                             child: Text(
-                                               'Production Done',
-                                               style: TextStyle(
-                                                 fontSize: 14,
-                                                 color: item['orderStatus'] ==
-                                                     'Production Done'
-                                                     ? Colors.grey
-                                                     : AppColor.blackColor,
-                                               ),
-                                             ),
-                                           ),
-                                         ),
-                                         GestureDetector(
-                                           onTap: () {
-                                             if (item['orderStatus'] !=
-                                                 'Dispatched') {
-                                               controller.updateStatus(
-                                                 status: 'Dispatched',
-                                                 userId: controller
-                                                     .order.value?['userDetails']
-                                                 ['userId'],
-                                                 subOrderId:
-                                                 item['subOrderId'],
-                                                 mainOrderId: controller
-                                                     .order.value?['orderListId'],
-                                                 userOrderCollectionId:
-                                                 controller
-                                                     .order.value?['orderId'],
-                                                 index: index,
-                                               );
-                                             }
-                                           },
-                                           child: Container(
-                                             padding: EdgeInsets.symmetric(
-                                               vertical: 10,
-                                             ),
-                                             width: Get.width,
-                                             child: Text(
-                                               'Dispatched',
-                                               style: TextStyle(
-                                                 fontSize: 14,
-                                                 color: item['orderStatus'] ==
-                                                     'Dispatched'
-                                                     ? Colors.grey
-                                                     : AppColor.blackColor,
-                                               ),
-                                             ),
-                                           ),
-                                         ),
-                                         Gap(10),
-                                       ],
-                                     ),
-                                   ),
-                                 );
-                               },
-                             );
-                           },
-                         ),
-                       ],
-                     ),
-                   ),
-                 );
-               },
-             ),
-           ),),
+            Obx(
+              () => Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: List.generate(
+                  controller.order.value?['order'].length ?? 0,
+                  (index) {
+                    final item = controller.order.value?['order'][index];
+                    return Visibility(
+                      visible: item['orderStatus'] != 'Reached',
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 10,
+                          horizontal: 20,
+                        ),
+                        child: Container(
+                          width: Get.width,
+                          decoration: ContainerDecoration.decoration(),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 10,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${item?['size']} ${item?['type'].toString().capitalize}${(item?['type'] == 'flat' && item?['size'] != '1 MM') ? '(${item?['flat']})' : ''} Cable',
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text('Sub Order Id : '),
+                                  Text(item['subOrderId']),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text('Gej : '),
+                                  Text(item['gej']),
+                                ],
+                              ),
+                              Visibility(
+                                visible: item['isWithGST'] != 'With GST',
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text('Price : '),
+                                    Text(item['PPMOO1']),
+                                  ],
+                                ),
+                              ),
+                              Visibility(
+                                visible: item?['isWithGST'] == 'With GST' ||
+                                    item?['isWithGST'] == '50%',
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text('GST Price : '),
+                                    Text(item['PPMOO2']),
+                                  ],
+                                ),
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text('Order Type : '),
+                                  Text(item['isWithGST']),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text('Order Status : '),
+                                  Text(item['orderStatus']),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text('Order Meter : '),
+                                  Text(item['totalMeter']),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text('Order Amount : '),
+                                  Text(item['totalAmount']),
+                                ],
+                              ),
+                              Gap(20),
+                              CommonAppButton(
+                                text: 'Update Order Status',
+                                buttonColor: AppColor.whiteColor,
+                                isBorder: true,
+                                textColor: AppColor.blackColor,
+                                buttonType: ButtonType.enable,
+                                onTap: () {
+                                  showModalBottomSheet(
+                                    context: context,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.vertical(
+                                          top: Radius.circular(16)),
+                                    ),
+                                    builder: (context) {
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 20,
+                                          horizontal: 20,
+                                        ),
+                                        child: Container(
+                                          width: Get.width,
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Update Order Status',
+                                                style: TextStyle(
+                                                  fontSize: 20,
+                                                  color: AppColor.blackColor,
+                                                ),
+                                              ),
+                                              Gap(10),
+                                              GestureDetector(
+                                                onTap: () {
+                                                  if (item['orderStatus'] !=
+                                                      'Pending') {
+                                                    controller.updateStatus(
+                                                      status: 'Pending',
+                                                      userId: controller
+                                                                  .order.value?[
+                                                              'userDetails']
+                                                          ['userId'],
+                                                      subOrderId:
+                                                          item['subOrderId'],
+                                                      mainOrderId: controller
+                                                              .order.value?[
+                                                          'orderListId'],
+                                                      userOrderCollectionId:
+                                                          controller
+                                                                  .order.value?[
+                                                              'orderId'],
+                                                      index: index,
+                                                    );
+                                                  }
+                                                },
+                                                child: Container(
+                                                  padding: EdgeInsets.symmetric(
+                                                    vertical: 10,
+                                                  ),
+                                                  width: Get.width,
+                                                  child: Text(
+                                                    'Pending',
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      color:
+                                                          item['orderStatus'] ==
+                                                                  'Pending'
+                                                              ? Colors.grey
+                                                              : AppColor
+                                                                  .blackColor,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              GestureDetector(
+                                                onTap: () {
+                                                  if (item['orderStatus'] !=
+                                                      'In Progress') {
+                                                    controller.updateStatus(
+                                                      status: 'In Progress',
+                                                      userId: controller
+                                                                  .order.value?[
+                                                              'userDetails']
+                                                          ['userId'],
+                                                      subOrderId:
+                                                          item['subOrderId'],
+                                                      mainOrderId: controller
+                                                              .order.value?[
+                                                          'orderListId'],
+                                                      userOrderCollectionId:
+                                                          controller
+                                                                  .order.value?[
+                                                              'orderId'],
+                                                      index: index,
+                                                    );
+                                                  }
+                                                },
+                                                child: Container(
+                                                  padding: EdgeInsets.symmetric(
+                                                    vertical: 10,
+                                                  ),
+                                                  width: Get.width,
+                                                  child: Text(
+                                                    'In Progress',
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      color:
+                                                          item['orderStatus'] ==
+                                                                  'In Progress'
+                                                              ? Colors.grey
+                                                              : AppColor
+                                                                  .blackColor,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              GestureDetector(
+                                                onTap: () {
+                                                  if (item['orderStatus'] !=
+                                                      'Production Done') {
+                                                    controller.updateStatus(
+                                                      status: 'Production Done',
+                                                      userId: controller
+                                                                  .order.value?[
+                                                              'userDetails']
+                                                          ['userId'],
+                                                      subOrderId:
+                                                          item['subOrderId'],
+                                                      mainOrderId: controller
+                                                              .order.value?[
+                                                          'orderListId'],
+                                                      userOrderCollectionId:
+                                                          controller
+                                                                  .order.value?[
+                                                              'orderId'],
+                                                      index: index,
+                                                    );
+                                                  }
+                                                },
+                                                child: Container(
+                                                  padding: EdgeInsets.symmetric(
+                                                    vertical: 10,
+                                                  ),
+                                                  width: Get.width,
+                                                  child: Text(
+                                                    'Production Done',
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      color: item['orderStatus'] ==
+                                                              'Production Done'
+                                                          ? Colors.grey
+                                                          : AppColor.blackColor,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              GestureDetector(
+                                                onTap: () {
+                                                  if (item['orderStatus'] !=
+                                                      'Dispatched') {
+                                                    controller.updateStatus(
+                                                      status: 'Dispatched',
+                                                      userId: controller
+                                                                  .order.value?[
+                                                              'userDetails']
+                                                          ['userId'],
+                                                      subOrderId:
+                                                          item['subOrderId'],
+                                                      mainOrderId: controller
+                                                              .order.value?[
+                                                          'orderListId'],
+                                                      userOrderCollectionId:
+                                                          controller
+                                                                  .order.value?[
+                                                              'orderId'],
+                                                      index: index,
+                                                    );
+                                                  }
+                                                },
+                                                child: Container(
+                                                  padding: EdgeInsets.symmetric(
+                                                    vertical: 10,
+                                                  ),
+                                                  width: Get.width,
+                                                  child: Text(
+                                                    'Dispatched',
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      color:
+                                                          item['orderStatus'] ==
+                                                                  'Dispatched'
+                                                              ? Colors.grey
+                                                              : AppColor
+                                                                  .blackColor,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              /* GestureDetector(
+                                                onTap: () {
+                                                  if (item['orderStatus'] !=
+                                                      'Dispatched') {
+                                                    controller.updateStatus(
+                                                      status: 'Reached',
+                                                      userId: controller
+                                                                  .order.value?[
+                                                              'userDetails']
+                                                          ['userId'],
+                                                      subOrderId:
+                                                          item['subOrderId'],
+                                                      mainOrderId: controller
+                                                              .order.value?[
+                                                          'orderListId'],
+                                                      userOrderCollectionId:
+                                                          controller
+                                                                  .order.value?[
+                                                              'orderId'],
+                                                      index: index,
+                                                    );
+                                                  }
+                                                },
+                                                child: Container(
+                                                  padding: EdgeInsets.symmetric(
+                                                    vertical: 10,
+                                                  ),
+                                                  width: Get.width,
+                                                  child: Text(
+                                                    'Reached',
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      color:
+                                                          item['orderStatus'] ==
+                                                                  'Dispatched'
+                                                              ? Colors.grey
+                                                              : AppColor
+                                                                  .blackColor,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),*/
+                                              Gap(10),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
           ],
         ),
       ),

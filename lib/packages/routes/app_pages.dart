@@ -1,3 +1,4 @@
+import 'package:field_king_admin/app/module/chat_screen/view/chat_screen_view.dart';
 import 'package:field_king_admin/app/module/edit_profile/view/edit_profile_view.dart';
 import 'package:field_king_admin/app/module/login/view/login_view.dart';
 import 'package:field_king_admin/app/module/order_details/view/order_details_view.dart';
@@ -36,6 +37,9 @@ class AppPages {
     ),GetPage(
       name: _Paths.orderDetailsView,
       page: () => OrderDetailsView(),
+    ),GetPage(
+      name: _Paths.chatScreenView,
+      page: () => ChatScreenView(),
     ),
   ];
 }

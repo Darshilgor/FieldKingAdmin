@@ -58,6 +58,10 @@ dependencies:
   image_cropper:
   permission_handler: ^11.3.1
   intl: ^0.20.2
+  flutter_cached_pdfview: ^0.4.3
+  file_picker: ^8.0.7
+  smooth_page_indicator: ^1.2.1
+  crop_your_image: ^2.0.0
   # firebase_database: ^11.3.5
 
 dev_dependencies:
