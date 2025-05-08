@@ -1,11 +1,13 @@
 import 'package:field_king_admin/packages/config.dart';
 import 'package:field_king_admin/packages/screen.dart';
+import 'package:field_king_admin/services/firebase_services.dart';
 
 class SplashScreenController extends GetxController {
   @override
   void onInit() {
     super.onInit();
     callOnboardingScreen();
+    updateUserActiveStatus();
     // startUpFunction();
   }
 
@@ -23,6 +25,12 @@ class SplashScreenController extends GetxController {
                 Routes.login,
               );
       },
+    );
+  }
+
+  updateUserActiveStatus() async {
+    await FirebaseFirestoreService.updateUserActiveStatus(
+      userId: Preference.userId,
     );
   }
 

@@ -335,4 +335,35 @@ class FirebaseFirestoreService {
       },
     );
   }
+
+  static updateIsTypingStatus({bool? isTyping, String? userId}) async {
+    print('doc id is $userId');
+    await firebaseFirestore.collection('Users').doc(userId).update(
+      {
+        'isTyping': isTyping,
+      },
+    );
+  }
+
+  static updateUserActiveStatus({
+    String? userId,
+  }) async {
+    await firebaseFirestore.collection('Users').doc(userId).update(
+      {
+        'isOnline': true,
+      },
+    );
+  }
+
+  static getChatUserDetails({
+    String? userId,
+  }) async {
+    return firebaseFirestore
+        .collection('Users')
+        .where(
+          'userId',
+          isEqualTo: userId,
+        )
+        .snapshots();
+  }
 }

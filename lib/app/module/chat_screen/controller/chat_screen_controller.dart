@@ -17,6 +17,11 @@ class ChatScreenController extends GetxController {
   final ScrollController scrollController = ScrollController();
   Rx<TextEditingController> messageController = TextEditingController().obs;
   final ImagePicker picker = ImagePicker();
+  RxString userFirstName = RxString('');
+  RxString userLastName = RxString('');
+  RxString userProfileImage = RxString('');
+  RxBool isOnline = RxBool(false);
+  Rx<Timestamp> lastActive = Timestamp.now().obs;
 
   @override
   void onInit() {
@@ -310,5 +315,27 @@ class ChatScreenController extends GetxController {
       Get.back();
       print("❌ Error taking photo and uploading: $e");
     }
+  }
+
+  updateTypingStatus({bool? isTyping, String? userId}) {
+    FirebaseFirestoreService.updateIsTypingStatus(
+      isTyping: isTyping,
+      userId: userId,
+    );
+  }
+
+  getUserDetails() {
+    FirebaseFirestoreService.getChatUserDetails(
+      userId: userId.value,
+    ).listen((doc) {
+      if (doc.exits) {
+        final data = doc.data();
+        userFirstName.value = data['firstName'] ?? '';
+        userLastName.value = data['lastName'] ?? '';
+        userProfileImage.value = data['profilePhoto'] ?? '';
+        isOnline.value = data['isOnline'] ?? false;
+        lastActive.value = data['lastActive'] ?? Timestamp.now();
+      }
+    });
   }
 }

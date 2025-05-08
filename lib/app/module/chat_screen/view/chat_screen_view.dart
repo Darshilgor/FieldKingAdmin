@@ -10,6 +10,7 @@ import 'package:field_king_admin/services/app_color/app_colors.dart';
 import 'package:field_king_admin/services/close_keyboard.dart';
 import 'package:field_king_admin/services/common_code.dart';
 import 'package:field_king_admin/services/custom_app_bar.dart';
+import 'package:field_king_admin/services/date_utils.dart';
 import 'package:field_king_admin/services/show_loader.dart';
 import 'package:field_king_admin/services/text_form_field.dart';
 import 'package:gap/gap.dart';
@@ -50,248 +51,299 @@ class _ChatScreenViewState extends State<ChatScreenView>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColor.whiteColor,
-      appBar: CustomAppBar(
-        title: Text(
-          'Chat Screen',
-        ),
-        isLeading: true,
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: StreamBuilder<QuerySnapshot>(
-              stream: controller.getChat(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                }
-
-                // controller.scrollToBottom();
-
-                var chats = snapshot.data?.docs;
-                if ((chats ?? []).isEmpty) {
-                  return Center(
-                    child: Text(
-                      "No chats available",
-                    ),
-                  );
-                }
-                if (snapshot.hasData) {
-                  return ListView.builder(
-                    itemCount: (chats ?? []).length,
-                    controller: controller.scrollController,
-                    padding: EdgeInsets.all(10),
-                    itemBuilder: (context, index) {
-                      var chat = chats?[index].data() as Map<String, dynamic>;
-                      bool isSender = chat['senderId'] == Preference.userId;
-
-                      return Align(
-                        alignment: isSender
-                            ? Alignment.centerRight
-                            : Alignment.centerLeft,
-                        child: Container(
-                          margin: EdgeInsets.symmetric(
-                            vertical: 5,
+      /*appBar: Row(
+        children: [],
+      ),*/
+      body: SafeArea(
+        child: Column(
+          children: [
+            Container(
+              height: 60,
+              width: Get.width,
+              child: Obx(
+                () => Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      extendedImage(
+                        imageUrl: controller.userProfileImage.value,
+                        height: 45,
+                        width: 45,
+                        fit: BoxFit.cover,
+                      ),
+                      Gap(20),
+                      Column(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '${controller.userFirstName.value} ${controller.userLastName.value}',
                           ),
-                          padding: chat['messageType'] == 'text'
-                              ? EdgeInsets.all(10)
-                              : EdgeInsets.all(0),
-                          decoration: chat['messageType'] == 'text'
-                              ? BoxDecoration(
-                                  color:
-                                      isSender ? Colors.blue : Colors.grey[300],
+                          Text(
+                            controller.isOnline.value == true
+                                ? 'Online'
+                                : DateUtilities.userLastActive(
+                                    controller.lastActive.value,
+                                  ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Expanded(
+              child:
+
+
+              StreamBuilder(stream:controller.getUserDetails() ,builder: (context,userSnapshot)
+                {
+                  return StreamBuilder<QuerySnapshot>(
+                    stream: controller.getChat(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+
+                      // controller.scrollToBottom();
+
+                      var chats = snapshot.data?.docs;
+                      if ((chats ?? []).isEmpty) {
+                        return const Center(
+                          child: Text(
+                            "No chats available",
+                          ),
+                        );
+                      }
+                      if (snapshot.hasData) {
+                        return ListView.builder(
+                          itemCount: (chats ?? []).length,
+                          controller: controller.scrollController,
+                          padding: const EdgeInsets.all(10),
+                          itemBuilder: (context, index) {
+                            var chat = chats?[index].data() as Map<String, dynamic>;
+                            bool isSender = chat['senderId'] == Preference.userId;
+
+                            return Align(
+                              alignment: isSender
+                                  ? Alignment.centerRight
+                                  : Alignment.centerLeft,
+                              child: Container(
+                                margin: const EdgeInsets.symmetric(
+                                  vertical: 5,
+                                ),
+                                padding: chat['messageType'] == 'text'
+                                    ? const EdgeInsets.all(10)
+                                    : const EdgeInsets.all(0),
+                                decoration: chat['messageType'] == 'text'
+                                    ? BoxDecoration(
+                                  color: isSender
+                                      ? Colors.blue
+                                      : Colors.grey[300],
                                   borderRadius: BorderRadius.circular(10),
                                 )
-                              : BoxDecoration(
+                                    : BoxDecoration(
                                   border: Border.all(
                                     color: Colors.blue,
                                     width: 2,
                                   ),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
-                          child: chat['messageType'] == 'text'
-                              ? Text(
+                                child: chat['messageType'] == 'text'
+                                    ? Text(
                                   chat['message'] ?? '',
                                   style: TextStyle(
                                       color: isSender
                                           ? Colors.white
                                           : Colors.black),
                                 )
-                              : chat['messageType'] == 'image'
-                                  ? GestureDetector(
-                                      onTap: () {
-                                        closeKeyboard();
-                                        final imageMessages = (chats ?? [])
-                                            .where((e) =>
-                                                (e.data() as Map<String,
-                                                    dynamic>)['messageType'] ==
-                                                'image')
-                                            .toList();
+                                    : chat['messageType'] == 'image'
+                                    ? GestureDetector(
+                                  onTap: () {
+                                    closeKeyboard();
+                                    final imageMessages = (chats ?? [])
+                                        .where((e) =>
+                                    (e.data() as Map<String,
+                                        dynamic>)[
+                                    'messageType'] ==
+                                        'image')
+                                        .toList();
 
-                                        final currentImageIndex =
-                                            imageMessages.indexWhere(
+                                    final currentImageIndex =
+                                    imageMessages.indexWhere(
                                           (e) =>
-                                              (e.data() as Map<String,
-                                                  dynamic>)['mediaUrl'] ==
-                                              chat['mediaUrl'],
-                                        );
+                                      (e.data() as Map<String,
+                                          dynamic>)['mediaUrl'] ==
+                                          chat['mediaUrl'],
+                                    );
 
-                                        Get.to(
+                                    Get.to(
                                           () => ImageGalleryView(
-                                            imageUrls: imageMessages
-                                                .map((e) => (e.data() as Map<
-                                                        String,
-                                                        dynamic>)['mediaUrl']
-                                                    as String)
-                                                .toList(),
-                                            initialIndex: currentImageIndex,
-                                          ),
-                                        );
-                                      },
-                                      child: extendedImage(
-                                        imageUrl: chat['mediaUrl'],
-                                        height: Get.height * 0.2,
-                                        width: Get.width * 0.7,
-                                        fit: BoxFit.fitWidth,
-                                        boxShap: BoxShape.rectangle,
-                                        catchHeight: 2000,
-                                        catchWidth: 2000,
-                                        circularProcessPadding: EdgeInsets.all(
-                                          100,
-                                        ),
-                                        BorderRadius: BorderRadius.circular(
-                                          10,
-                                        ),
+                                        imageUrls: imageMessages
+                                            .map((e) => (e.data() as Map<
+                                            String,
+                                            dynamic>)['mediaUrl']
+                                        as String)
+                                            .toList(),
+                                        initialIndex: currentImageIndex,
                                       ),
-                                    )
-                                  : GestureDetector(
-                                      onTap: () {
-                                        closeKeyboard();
-                                        Get.to(
-                                          () => PdfViewerScreen(
-                                            pdfUrl: chat['mediaUrl'],
-                                          ),
-                                        );
-                                      },
-                                      child: Container(
-                                        height: 100,
-                                        width: 200,
-                                        padding: EdgeInsets.all(10),
-                                        decoration: BoxDecoration(
-                                          border: Border.all(
-                                              color: Colors.red, width: 2),
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          color: Colors.white,
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            Icon(Icons.picture_as_pdf,
-                                                color: Colors.red, size: 40),
-                                            SizedBox(width: 10),
-                                            Expanded(
-                                              child: Text(
-                                                "View PDF",
-                                                style: TextStyle(
-                                                    fontSize: 16,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
+                                    );
+                                  },
+                                  child: extendedImage(
+                                    imageUrl: chat['mediaUrl'],
+                                    height: Get.height * 0.2,
+                                    width: Get.width * 0.7,
+                                    fit: BoxFit.fitWidth,
+                                    boxShap: BoxShape.rectangle,
+                                    catchHeight: 2000,
+                                    catchWidth: 2000,
+                                    circularProcessPadding:
+                                    const EdgeInsets.all(
+                                      100,
                                     ),
-                        ),
-                      );
+                                    BorderRadius: BorderRadius.circular(
+                                      10,
+                                    ),
+                                  ),
+                                )
+                                    : GestureDetector(
+                                  onTap: () {
+                                    closeKeyboard();
+                                    Get.to(
+                                          () => PdfViewerScreen(
+                                        pdfUrl: chat['mediaUrl'],
+                                      ),
+                                    );
+                                  },
+                                  child: Container(
+                                    height: 100,
+                                    width: 200,
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                          color: Colors.red, width: 2),
+                                      borderRadius:
+                                      BorderRadius.circular(10),
+                                      color: Colors.white,
+                                    ),
+                                    child: const Row(
+                                      children: [
+                                        Icon(Icons.picture_as_pdf,
+                                            color: Colors.red, size: 40),
+                                        SizedBox(width: 10),
+                                        Expanded(
+                                          child: Text(
+                                            "View PDF",
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight:
+                                                FontWeight.bold),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      } else {
+                        return Container();
+                      }
                     },
                   );
-                } else {
-                  return Container();
-                }
-              },
+                },)
             ),
-          ),
-          Obx(
-            () => Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 10,
-              ),
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: AppColor.blackColor,
-                  ),
-                  borderRadius: BorderRadius.circular(
-                    20,
-                  ),
+            Obx(
+              () => Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 10,
                 ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: InputField(
-                        controller: controller.messageController.value,
-                        hintText: 'Type a message...',
-                        textInputAction: TextInputAction.done,
-                        validator: (value) {},
-                        onChange: (value) {
-                          controller.messageController.refresh();
-                          // controller.updateTypingStatus(value: value);
-                        },
-                        minLine: 1,
-                        maxLine: 3,
-                        border: InputBorder.none,
-                        disableBorder: InputBorder.none,
-                        enableBorder: InputBorder.none,
-                        focusBorder: InputBorder.none,
-                      ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: AppColor.blackColor,
                     ),
-                    Row(
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            openBottomSheet();
+                    borderRadius: BorderRadius.circular(
+                      20,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: InputField(
+                          controller: controller.messageController.value,
+                          hintText: 'Type a message...',
+                          textInputAction: TextInputAction.done,
+                          validator: (value) {},
+                          onChange: (value) {
+                            controller.messageController.refresh();
+                            controller.updateTypingStatus(
+                              isTyping: (value ?? '').isNotEmpty ? true : false,
+                              userId: controller.adminId.value,
+                            );
                           },
-                          child: Icon(
-                            Icons.add,
-                            color: Colors.grey,
-                            size: 30,
-                          ),
+                          minLine: 1,
+                          maxLine: 3,
+                          border: InputBorder.none,
+                          disableBorder: InputBorder.none,
+                          enableBorder: InputBorder.none,
+                          focusBorder: InputBorder.none,
                         ),
-                        Gap(5),
-                        Padding(
-                          padding: const EdgeInsets.only(
-                            right: 5,
-                          ),
-                          child: GestureDetector(
+                      ),
+                      Row(
+                        children: [
+                          GestureDetector(
                             onTap: () {
-                              controller.scrollToBottom();
-                              controller.sendMessage(
-                                adminId: controller.adminId.value,
-                                message:
-                                    controller.messageController.value.text,
-                                userId: controller.userId.value,
-                              );
+                              openBottomSheet();
                             },
-                            child: Icon(
-                              Icons.send,
-                              size: 25,
-                              color: controller
-                                      .messageController.value.text.isNotEmpty
-                                  ? Colors.blue
-                                  : Colors.grey,
+                            child: const Icon(
+                              Icons.add,
+                              color: Colors.grey,
+                              size: 30,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
+                          const Gap(5),
+                          Padding(
+                            padding: const EdgeInsets.only(
+                              right: 5,
+                            ),
+                            child: GestureDetector(
+                              onTap: () {
+                                controller.scrollToBottom();
+                                controller.sendMessage(
+                                  adminId: controller.adminId.value,
+                                  message:
+                                      controller.messageController.value.text,
+                                  userId: controller.userId.value,
+                                );
+                              },
+                              child: Icon(
+                                Icons.send,
+                                size: 25,
+                                color: controller
+                                        .messageController.value.text.isNotEmpty
+                                    ? Colors.blue
+                                    : Colors.grey,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -299,7 +351,7 @@ class _ChatScreenViewState extends State<ChatScreenView>
   openBottomSheet() {
     return showModalBottomSheet(
       context: Get.context!,
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
@@ -309,24 +361,24 @@ class _ChatScreenViewState extends State<ChatScreenView>
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                leading: Icon(Icons.attach_file, color: Colors.blue),
-                title: Text("Choose a File"),
+                leading: const Icon(Icons.attach_file, color: Colors.blue),
+                title: const Text("Choose a File"),
                 onTap: () {
                   Get.back();
                   controller.pickDocument();
                 },
               ),
               ListTile(
-                leading: Icon(Icons.image, color: Colors.green),
-                title: Text("Pick from Gallery"),
+                leading: const Icon(Icons.image, color: Colors.green),
+                title: const Text("Pick from Gallery"),
                 onTap: () {
                   Get.back();
                   controller.pickImageFromGallery();
                 },
               ),
               ListTile(
-                leading: Icon(Icons.camera_alt, color: Colors.red),
-                title: Text("Take a Photo"),
+                leading: const Icon(Icons.camera_alt, color: Colors.red),
+                title: const Text("Take a Photo"),
                 onTap: () {
                   Get.back();
                   controller.takePhoto();

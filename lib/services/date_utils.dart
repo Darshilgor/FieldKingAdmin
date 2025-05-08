@@ -29,10 +29,39 @@ class DateUtilities {
     return outputFormat.format(dateTime);
   }
 
-
   static String formatFirestoreDate(Timestamp? timestamp) {
     if (timestamp == null) return 'Invalid Date';
     DateTime dateTime = timestamp.toDate();
     return DateFormat('dd/MM/yyyy').format(dateTime);
+  }
+
+  static String userLastActive(Timestamp timestamp) {
+    DateTime date = timestamp.toDate();
+    DateTime now = DateTime.now();
+    Duration diff = now.difference(date);
+
+    if (diff.inMinutes == 0) {
+      return "Recently active";
+    } else if (diff.inMinutes < 60) {
+      return "${diff.inMinutes} min ago";
+    }
+
+    bool isToday =
+        now.day == date.day && now.month == date.month && now.year == date.year;
+
+    bool isYesterday = now.subtract(Duration(days: 1)).day == date.day &&
+        now.subtract(Duration(days: 1)).month == date.month &&
+        now.subtract(Duration(days: 1)).year == date.year;
+
+    final timeFormat = DateFormat('h:mm a');
+
+    if (isToday) {
+      return "Today at ${timeFormat.format(date)}";
+    } else if (isYesterday) {
+      return "Yesterday at ${timeFormat.format(date)}";
+    } else {
+      final dateFormat = DateFormat('MMM d');
+      return "${dateFormat.format(date)} at ${timeFormat.format(date)}";
+    }
   }
 }
