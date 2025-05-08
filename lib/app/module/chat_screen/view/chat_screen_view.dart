@@ -68,13 +68,26 @@ class _ChatScreenViewState extends State<ChatScreenView>
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      extendedImage(
-                        imageUrl: controller.userProfileImage.value,
-                        height: 45,
-                        width: 45,
-                        fit: BoxFit.cover,
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: controller.isOnline.value
+                                ? Colors.green
+                                : Colors.transparent,
+                            width: controller.isOnline.value ? 2.5 : 0,
+                          ),
+                          shape: BoxShape.circle,
+                        ),
+                        child: extendedImage(
+                          imageUrl: controller.userProfileImage.value,
+                          height: 45,
+                          width: 45,
+                          fit: BoxFit.cover,
+                        ),
                       ),
-                      Gap(20),
+                      Gap(
+                        controller.isOnline.value ? 10 : 7.5,
+                      ),
                       Column(
                         mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -98,168 +111,166 @@ class _ChatScreenViewState extends State<ChatScreenView>
               ),
             ),
             Expanded(
-              child:
+                child: StreamBuilder<DocumentSnapshot>(
+              stream: controller.getUserDetails(),
+              builder: (context, userSnapshot) {
+                return StreamBuilder<QuerySnapshot>(
+                  stream: controller.getChat(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
 
+                    var chats = snapshot.data?.docs;
+                    if ((chats ?? []).isEmpty) {
+                      return const Center(
+                        child: Text(
+                          "No chats available",
+                        ),
+                      );
+                    }
+                    if (snapshot.hasData) {
+                      return ListView.builder(
+                        itemCount: (chats ?? []).length,
+                        controller: controller.scrollController,
+                        padding: const EdgeInsets.all(10),
+                        itemBuilder: (context, index) {
+                          var chat =
+                              chats?[index].data() as Map<String, dynamic>;
+                          bool isSender = chat['senderId'] == Preference.userId;
 
-              StreamBuilder(stream:controller.getUserDetails() ,builder: (context,userSnapshot)
-                {
-                  return StreamBuilder<QuerySnapshot>(
-                    stream: controller.getChat(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-
-                      // controller.scrollToBottom();
-
-                      var chats = snapshot.data?.docs;
-                      if ((chats ?? []).isEmpty) {
-                        return const Center(
-                          child: Text(
-                            "No chats available",
-                          ),
-                        );
-                      }
-                      if (snapshot.hasData) {
-                        return ListView.builder(
-                          itemCount: (chats ?? []).length,
-                          controller: controller.scrollController,
-                          padding: const EdgeInsets.all(10),
-                          itemBuilder: (context, index) {
-                            var chat = chats?[index].data() as Map<String, dynamic>;
-                            bool isSender = chat['senderId'] == Preference.userId;
-
-                            return Align(
-                              alignment: isSender
-                                  ? Alignment.centerRight
-                                  : Alignment.centerLeft,
-                              child: Container(
-                                margin: const EdgeInsets.symmetric(
-                                  vertical: 5,
-                                ),
-                                padding: chat['messageType'] == 'text'
-                                    ? const EdgeInsets.all(10)
-                                    : const EdgeInsets.all(0),
-                                decoration: chat['messageType'] == 'text'
-                                    ? BoxDecoration(
-                                  color: isSender
-                                      ? Colors.blue
-                                      : Colors.grey[300],
-                                  borderRadius: BorderRadius.circular(10),
-                                )
-                                    : BoxDecoration(
-                                  border: Border.all(
-                                    color: Colors.blue,
-                                    width: 2,
-                                  ),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: chat['messageType'] == 'text'
-                                    ? Text(
-                                  chat['message'] ?? '',
-                                  style: TextStyle(
+                          return Align(
+                            alignment: isSender
+                                ? Alignment.centerRight
+                                : Alignment.centerLeft,
+                            child: Container(
+                              margin: const EdgeInsets.symmetric(
+                                vertical: 5,
+                              ),
+                              padding: chat['messageType'] == 'text'
+                                  ? const EdgeInsets.all(10)
+                                  : const EdgeInsets.all(0),
+                              decoration: chat['messageType'] == 'text'
+                                  ? BoxDecoration(
                                       color: isSender
-                                          ? Colors.white
-                                          : Colors.black),
-                                )
-                                    : chat['messageType'] == 'image'
-                                    ? GestureDetector(
-                                  onTap: () {
-                                    closeKeyboard();
-                                    final imageMessages = (chats ?? [])
-                                        .where((e) =>
-                                    (e.data() as Map<String,
-                                        dynamic>)[
-                                    'messageType'] ==
-                                        'image')
-                                        .toList();
-
-                                    final currentImageIndex =
-                                    imageMessages.indexWhere(
-                                          (e) =>
-                                      (e.data() as Map<String,
-                                          dynamic>)['mediaUrl'] ==
-                                          chat['mediaUrl'],
-                                    );
-
-                                    Get.to(
-                                          () => ImageGalleryView(
-                                        imageUrls: imageMessages
-                                            .map((e) => (e.data() as Map<
-                                            String,
-                                            dynamic>)['mediaUrl']
-                                        as String)
-                                            .toList(),
-                                        initialIndex: currentImageIndex,
-                                      ),
-                                    );
-                                  },
-                                  child: extendedImage(
-                                    imageUrl: chat['mediaUrl'],
-                                    height: Get.height * 0.2,
-                                    width: Get.width * 0.7,
-                                    fit: BoxFit.fitWidth,
-                                    boxShap: BoxShape.rectangle,
-                                    catchHeight: 2000,
-                                    catchWidth: 2000,
-                                    circularProcessPadding:
-                                    const EdgeInsets.all(
-                                      100,
-                                    ),
-                                    BorderRadius: BorderRadius.circular(
-                                      10,
-                                    ),
-                                  ),
-                                )
-                                    : GestureDetector(
-                                  onTap: () {
-                                    closeKeyboard();
-                                    Get.to(
-                                          () => PdfViewerScreen(
-                                        pdfUrl: chat['mediaUrl'],
-                                      ),
-                                    );
-                                  },
-                                  child: Container(
-                                    height: 100,
-                                    width: 200,
-                                    padding: const EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
+                                          ? Colors.blue
+                                          : Colors.grey[300],
+                                      borderRadius: BorderRadius.circular(10),
+                                    )
+                                  : BoxDecoration(
                                       border: Border.all(
-                                          color: Colors.red, width: 2),
-                                      borderRadius:
-                                      BorderRadius.circular(10),
-                                      color: Colors.white,
+                                        color: Colors.blue,
+                                        width: 2,
+                                      ),
+                                      borderRadius: BorderRadius.circular(10),
                                     ),
-                                    child: const Row(
-                                      children: [
-                                        Icon(Icons.picture_as_pdf,
-                                            color: Colors.red, size: 40),
-                                        SizedBox(width: 10),
-                                        Expanded(
-                                          child: Text(
-                                            "View PDF",
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight:
-                                                FontWeight.bold),
+                              child: chat['messageType'] == 'text'
+                                  ? Text(
+                                      chat['message'] ?? '',
+                                      style: TextStyle(
+                                          color: isSender
+                                              ? Colors.white
+                                              : Colors.black),
+                                    )
+                                  : chat['messageType'] == 'image'
+                                      ? GestureDetector(
+                                          onTap: () {
+                                            closeKeyboard();
+                                            final imageMessages = (chats ?? [])
+                                                .where((e) =>
+                                                    (e.data() as Map<String,
+                                                            dynamic>)[
+                                                        'messageType'] ==
+                                                    'image')
+                                                .toList();
+
+                                            final currentImageIndex =
+                                                imageMessages.indexWhere(
+                                              (e) =>
+                                                  (e.data() as Map<String,
+                                                      dynamic>)['mediaUrl'] ==
+                                                  chat['mediaUrl'],
+                                            );
+
+                                            Get.to(
+                                              () => ImageGalleryView(
+                                                imageUrls: imageMessages
+                                                    .map((e) => (e.data()
+                                                            as Map<String,
+                                                                dynamic>)[
+                                                        'mediaUrl'] as String)
+                                                    .toList(),
+                                                initialIndex: currentImageIndex,
+                                              ),
+                                            );
+                                          },
+                                          child: extendedImage(
+                                            imageUrl: chat['mediaUrl'],
+                                            height: Get.height * 0.2,
+                                            width: Get.width * 0.7,
+                                            fit: BoxFit.fitWidth,
+                                            boxShap: BoxShape.rectangle,
+                                            catchHeight: 2000,
+                                            catchWidth: 2000,
+                                            circularProcessPadding:
+                                                const EdgeInsets.all(
+                                              100,
+                                            ),
+                                            BorderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
+                                          ),
+                                        )
+                                      : GestureDetector(
+                                          onTap: () {
+                                            closeKeyboard();
+                                            Get.to(
+                                              () => PdfViewerScreen(
+                                                pdfUrl: chat['mediaUrl'],
+                                              ),
+                                            );
+                                          },
+                                          child: Container(
+                                            height: 100,
+                                            width: 200,
+                                            padding: const EdgeInsets.all(10),
+                                            decoration: BoxDecoration(
+                                              border: Border.all(
+                                                  color: Colors.red, width: 2),
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              color: Colors.white,
+                                            ),
+                                            child: const Row(
+                                              children: [
+                                                Icon(Icons.picture_as_pdf,
+                                                    color: Colors.red,
+                                                    size: 40),
+                                                SizedBox(width: 10),
+                                                Expanded(
+                                                  child: Text(
+                                                    "View PDF",
+                                                    style: TextStyle(
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                        );
-                      } else {
-                        return Container();
-                      }
-                    },
-                  );
-                },)
-            ),
+                            ),
+                          );
+                        },
+                      );
+                    } else {
+                      return Container();
+                    }
+                  },
+                );
+              },
+            )),
             Obx(
               () => Padding(
                 padding: const EdgeInsets.symmetric(

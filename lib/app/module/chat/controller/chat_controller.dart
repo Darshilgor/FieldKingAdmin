@@ -6,4 +6,11 @@ class ChatController extends GetxController {
     return FirebaseFirestoreService.getUserList();
   }
 
+  getUserDetails({String? userId}) {
+    FirebaseFirestoreService.getChatUserDetails(userId: userId).listen(
+      (snapshot) {
+        final data = snapshot.docs.first.data() as Map<String, dynamic>;
+      },
+    );
+  }
 }

@@ -1,6 +1,7 @@
 import 'package:field_king_admin/packages/config.dart';
 import 'package:field_king_admin/packages/screen.dart';
 import 'package:field_king_admin/services/firebase_services.dart';
+import 'package:field_king_admin/services/genera_controller.dart';
 
 class SplashScreenController extends GetxController {
   @override
@@ -8,7 +9,7 @@ class SplashScreenController extends GetxController {
     super.onInit();
     callOnboardingScreen();
     updateUserActiveStatus();
-    // startUpFunction();
+    startUpFunction();
   }
 
   Future<void> callOnboardingScreen() async {
@@ -34,8 +35,9 @@ class SplashScreenController extends GetxController {
     );
   }
 
-// startUpFunction() {
-//   FirebaseFirestoreServices.getIsShowWithOutGst();
-//   FirebaseFirestoreServices.getUser();
-// }
+  startUpFunction() {
+    GeneralController.isShowWithOutGst.value = true;
+    // FirebaseFirestoreService.getIsShowWithOutGst();
+    // FirebaseFirestoreService.getUser();
+  }
 }

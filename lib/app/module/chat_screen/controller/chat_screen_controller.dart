@@ -325,17 +325,15 @@ class ChatScreenController extends GetxController {
   }
 
   getUserDetails() {
-    FirebaseFirestoreService.getChatUserDetails(
-      userId: userId.value,
-    ).listen((doc) {
-      if (doc.exits) {
-        final data = doc.data();
-        userFirstName.value = data['firstName'] ?? '';
-        userLastName.value = data['lastName'] ?? '';
-        userProfileImage.value = data['profilePhoto'] ?? '';
-        isOnline.value = data['isOnline'] ?? false;
-        lastActive.value = data['lastActive'] ?? Timestamp.now();
-      }
+    FirebaseFirestoreService.getChatUserDetails(userId: userId.value)
+        .listen((snapshot) {
+      final data = snapshot.docs.first.data() as Map<String, dynamic>;
+
+      userFirstName.value = data['firstName'] ?? '';
+      userLastName.value = data['lastName'] ?? '';
+      userProfileImage.value = data['profilePhoto'] ?? '';
+      isOnline.value = data['isOnline'] ?? false;
+      lastActive.value = data['lastActive'] ?? Timestamp.now();
     });
   }
 }

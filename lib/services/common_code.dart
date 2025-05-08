@@ -5,6 +5,7 @@ import 'package:field_king_admin/packages/config.dart';
 import 'package:field_king_admin/packages/screen.dart';
 import 'package:field_king_admin/services/app_color/app_colors.dart';
 import 'package:field_king_admin/services/app_icon.dart';
+import 'package:field_king_admin/services/text_style/text_style.dart';
 import 'package:field_king_admin/services/toast_message.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
@@ -12,6 +13,38 @@ import 'package:image_picker/image_picker.dart';
 
 
 final ImagePicker picker = ImagePicker();
+
+
+
+Widget customContainer({
+  String? title,
+  double? width,
+  Function()? onTap,
+}) {
+  return GestureDetector(
+    onTap: onTap,
+    child: Container(
+      width: width ?? Get.width,
+      padding: EdgeInsets.symmetric(
+        vertical: 10,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.blue,
+        borderRadius: BorderRadius.circular(
+          10,
+        ),
+      ),
+      child: Center(
+        child: Text(
+          title ?? '',
+          style: TextStyle().medium16.textColor(
+            AppColor.blackColor,
+          ),
+        ),
+      ),
+    ),
+  );
+}
 
 ExtendedImage extendedImage({
   required String imageUrl,

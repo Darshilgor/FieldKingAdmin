@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:field_king_admin/app/model/get_product_model.dart';
+import 'package:field_king_admin/services/genera_controller.dart';
 import 'package:field_king_admin/services/get_storage/get_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -355,9 +357,9 @@ class FirebaseFirestoreService {
     );
   }
 
-  static getChatUserDetails({
+  static Stream<QuerySnapshot> getChatUserDetails({
     String? userId,
-  }) async {
+  }) {
     return firebaseFirestore
         .collection('Users')
         .where(
@@ -365,5 +367,31 @@ class FirebaseFirestoreService {
           isEqualTo: userId,
         )
         .snapshots();
+  }
+
+  static Future getProductList() async {
+    QuerySnapshot snapshot =
+        await FirebaseFirestore.instance.collection('Products').get();
+
+    return snapshot.docs.map(
+      (doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        return Product.fromMap(doc.id, data);
+      },
+    ).toList();
+  }
+  static Future<void> getIsShowWithOutGst() async {
+    var isShowWithOutGst;
+    DocumentSnapshot snapshot = await firebaseFirestore
+        .collection('IsShowWithOutGST')
+        .doc('IsShowWithOutGST')
+        .get();
+    isShowWithOutGst = snapshot.data();
+    if (isShowWithOutGst['IsShowWithOutGST'] != null) {
+      GeneralController.isShowWithOutGst.value =
+      isShowWithOutGst['IsShowWithOutGST'];
+    } else {
+      GeneralController.isShowWithOutGst.value = false;
+    }
   }
 }
