@@ -1,13 +1,10 @@
 import 'dart:async';
-
 import 'package:field_king_admin/packages/config.dart';
 import 'package:field_king_admin/packages/screen.dart';
-
-
+import 'package:field_king_admin/services/firebase_services.dart';
 
 @pragma('vm:entry-point')
 Future<void> backgroundNotificationHandler(RemoteMessage message) async {
-
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -39,8 +36,44 @@ late AndroidNotificationChannel channel;
 bool isFlutterLocalNotificationsInitialized = false;
 late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    updateUserStatus(isOnline: true);
+  }
+
+  @override
+  void dispose() {
+    updateUserStatus(
+      isOnline: false,
+    ); // Mark user offline when app is killed
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      updateUserStatus(
+        isOnline: true,
+      );
+    } else if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.detached ||
+        state == AppLifecycleState.inactive) {
+      updateUserStatus(
+        isOnline: false,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +87,14 @@ class MyApp extends StatelessWidget {
       getPages: AppPages.routes,
       initialRoute: Routes.splashScreen,
       builder: EasyLoading.init(),
+    );
+  }
+
+  Future<void> updateUserStatus({bool? isOnline}) async {
+    String? userId = Preference.userId;
+    await FirebaseFirestoreService.updateUserActiveStatus(
+      userId: userId,
+      online: isOnline,
     );
   }
 }

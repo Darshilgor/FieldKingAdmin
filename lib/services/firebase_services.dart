@@ -349,10 +349,12 @@ class FirebaseFirestoreService {
 
   static updateUserActiveStatus({
     String? userId,
+    bool? online,
   }) async {
     await firebaseFirestore.collection('Users').doc(userId).update(
       {
-        'isOnline': true,
+        'isOnline': online,
+        'lastActive': FieldValue.serverTimestamp(),
       },
     );
   }
@@ -380,6 +382,7 @@ class FirebaseFirestoreService {
       },
     ).toList();
   }
+
   static Future<void> getIsShowWithOutGst() async {
     var isShowWithOutGst;
     DocumentSnapshot snapshot = await firebaseFirestore
@@ -389,7 +392,7 @@ class FirebaseFirestoreService {
     isShowWithOutGst = snapshot.data();
     if (isShowWithOutGst['IsShowWithOutGST'] != null) {
       GeneralController.isShowWithOutGst.value =
-      isShowWithOutGst['IsShowWithOutGST'];
+          isShowWithOutGst['IsShowWithOutGST'];
     } else {
       GeneralController.isShowWithOutGst.value = false;
     }

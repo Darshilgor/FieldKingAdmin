@@ -22,6 +22,10 @@ class ChatScreenController extends GetxController {
   RxString userProfileImage = RxString('');
   RxBool isOnline = RxBool(false);
   Rx<Timestamp> lastActive = Timestamp.now().obs;
+  RxBool isTyping = RxBool(false);
+  RxBool isShowDeleteButton = RxBool(false);
+  RxBool longPressed = RxBool(false);
+  RxString selectedMessageId = RxString('');
 
   @override
   void onInit() {
@@ -325,15 +329,17 @@ class ChatScreenController extends GetxController {
   }
 
   getUserDetails() {
-    FirebaseFirestoreService.getChatUserDetails(userId: userId.value)
-        .listen((snapshot) {
-      final data = snapshot.docs.first.data() as Map<String, dynamic>;
+    FirebaseFirestoreService.getChatUserDetails(userId: userId.value).listen(
+      (snapshot) {
+        final data = snapshot.docs.first.data() as Map<String, dynamic>;
 
-      userFirstName.value = data['firstName'] ?? '';
-      userLastName.value = data['lastName'] ?? '';
-      userProfileImage.value = data['profilePhoto'] ?? '';
-      isOnline.value = data['isOnline'] ?? false;
-      lastActive.value = data['lastActive'] ?? Timestamp.now();
-    });
+        userFirstName.value = data['firstName'] ?? '';
+        userLastName.value = data['lastName'] ?? '';
+        userProfileImage.value = data['profilePhoto'] ?? '';
+        isOnline.value = data['isOnline'] ?? false;
+        lastActive.value = data['lastActive'] ?? Timestamp.now();
+        isTyping.value = data['isTyping'] ?? false;
+      },
+    );
   }
 }

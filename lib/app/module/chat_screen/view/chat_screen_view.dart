@@ -49,311 +49,405 @@ class _ChatScreenViewState extends State<ChatScreenView>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColor.whiteColor,
-      /*appBar: Row(
-        children: [],
-      ),*/
-      body: SafeArea(
-        child: Column(
-          children: [
-            Container(
-              height: 60,
-              width: Get.width,
-              child: Obx(
+    return GestureDetector(
+      onTap: () {
+        controller.isShowDeleteButton.value = false;
+      },
+      child: Scaffold(
+        backgroundColor: AppColor.whiteColor,
+        /*appBar: Row(
+          children: [],
+        ),*/
+        body: SafeArea(
+          child: Column(
+            children: [
+              Container(
+                height: 60,
+                width: Get.width,
+                child: Obx(
+                  () => Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: controller.isOnline.value
+                                      ? Colors.green
+                                      : Colors.transparent,
+                                  width: controller.isOnline.value ? 2.5 : 0,
+                                ),
+                                shape: BoxShape.circle,
+                              ),
+                              child: extendedImage(
+                                imageUrl: controller.userProfileImage.value,
+                                height: 45,
+                                width: 45,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            Gap(
+                              controller.isOnline.value ? 10 : 7.5,
+                            ),
+                            Column(
+                              mainAxisSize: MainAxisSize.max,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '${controller.userFirstName.value} ${controller.userLastName.value}',
+                                ),
+                                Text(
+                                  controller.isOnline.value == true
+                                      ? 'Online'
+                                      : DateUtilities.userLastActive(
+                                          controller.lastActive.value,
+                                        ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                  child: StreamBuilder<DocumentSnapshot>(
+                stream: controller.getUserDetails(),
+                builder: (context, userSnapshot) {
+                  return StreamBuilder<QuerySnapshot>(
+                    stream: controller.getChat(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+
+                      var chats = snapshot.data?.docs;
+                      if ((chats ?? []).isEmpty) {
+                        return const Center(
+                          child: Text(
+                            "No chats available",
+                          ),
+                        );
+                      }
+                      if (snapshot.hasData) {
+                        return ListView.builder(
+                          itemCount: (chats ?? []).length,
+                          controller: controller.scrollController,
+                          padding: const EdgeInsets.all(10),
+                          itemBuilder: (context, index) {
+                            var chat =
+                                chats?[index].data() as Map<String, dynamic>;
+                            bool isSender =
+                                chat['senderId'] == Preference.userId;
+
+                            final isSelected =
+                                controller.selectedMessageId.value ==
+                                    chat['id'];
+
+                            return Align(
+                              alignment: isSender
+                                  ? Alignment.centerRight
+                                  : Alignment.centerLeft,
+                              child: Container(
+                                margin: const EdgeInsets.symmetric(
+                                  vertical: 5,
+                                ),
+                                padding: chat['messageType'] == 'text'
+                                    ? const EdgeInsets.all(10)
+                                    : const EdgeInsets.all(0),
+                                decoration: chat['messageType'] == 'text'
+                                    ? BoxDecoration(
+                                        color: isSender
+                                            ? Colors.blue
+                                            : Colors.grey[300],
+                                        borderRadius: BorderRadius.circular(10),
+                                      )
+                                    : BoxDecoration(
+                                        border: Border.all(
+                                          color: Colors.blue,
+                                          width: 2,
+                                        ),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                child: chat['messageType'] == 'text'
+                                    ? Stack(
+                                        children: [
+                                          GestureDetector(
+                                            onLongPress: () {
+                                              controller.isShowDeleteButton
+                                                      .value =
+                                                  !controller
+                                                      .isShowDeleteButton.value;
+                                            },
+                                            onTap: () {
+                                              controller.selectedMessageId
+                                                  .value = chat['id'];
+                                            },
+                                            child: Text(
+                                              chat['message'] ?? '',
+                                              style: TextStyle(
+                                                color: isSender
+                                                    ? Colors.white
+                                                    : Colors.black,
+                                              ),
+                                            ),
+                                          ),
+                                          if (isSelected)
+                                            Positioned(
+                                              top: -10,
+                                              right: -10,
+                                              child: IconButton(
+                                                icon: const Icon(Icons.delete,
+                                                    color: Colors.red,
+                                                    size: 20),
+                                                onPressed: () {
+                                                  // controller.deleteMessage(
+                                                  //     chat['messageId']);
+                                                  // controller.isShowDeleteButton
+                                                  //     .value = false;
+                                                  // controller.selectedMessageId
+                                                  //     .value = '';
+                                                },
+                                              ),
+                                            ),
+                                        ],
+                                      )
+                                    : chat['messageType'] == 'image'
+                                        ? GestureDetector(
+                                            onTap: () {
+                                              closeKeyboard();
+                                              final imageMessages =
+                                                  (chats ?? [])
+                                                      .where((e) =>
+                                                          (e.data() as Map<
+                                                                  String,
+                                                                  dynamic>)[
+                                                              'messageType'] ==
+                                                          'image')
+                                                      .toList();
+
+                                              final currentImageIndex =
+                                                  imageMessages.indexWhere(
+                                                (e) =>
+                                                    (e.data() as Map<String,
+                                                        dynamic>)['mediaUrl'] ==
+                                                    chat['mediaUrl'],
+                                              );
+
+                                              Get.to(
+                                                () => ImageGalleryView(
+                                                  imageUrls: imageMessages
+                                                      .map((e) => (e.data()
+                                                              as Map<String,
+                                                                  dynamic>)[
+                                                          'mediaUrl'] as String)
+                                                      .toList(),
+                                                  initialIndex:
+                                                      currentImageIndex,
+                                                ),
+                                              );
+                                            },
+                                            child: extendedImage(
+                                              onLongPress: () {
+                                                controller.isShowDeleteButton
+                                                        .value =
+                                                    !controller
+                                                        .isShowDeleteButton
+                                                        .value;
+                                              },
+                                              imageUrl: chat['mediaUrl'],
+                                              height: Get.height * 0.2,
+                                              width: Get.width * 0.7,
+                                              fit: BoxFit.fitWidth,
+                                              boxShap: BoxShape.rectangle,
+                                              catchHeight: 2000,
+                                              catchWidth: 2000,
+                                              circularProcessPadding:
+                                                  const EdgeInsets.all(
+                                                100,
+                                              ),
+                                              BorderRadius:
+                                                  BorderRadius.circular(
+                                                10,
+                                              ),
+                                            ),
+                                          )
+                                        : GestureDetector(
+                                            onLongPress: () {
+                                              controller.longPressed.value =
+                                                  true;
+                                              controller.isShowDeleteButton
+                                                      .value =
+                                                  !controller
+                                                      .isShowDeleteButton.value;
+                                              Future.delayed(
+                                                const Duration(
+                                                    milliseconds: 300),
+                                                () {
+                                                  controller.longPressed.value =
+                                                      false;
+                                                },
+                                              );
+                                            },
+                                            onTap: () {
+                                              if (controller.longPressed.value)
+                                                return;
+                                              closeKeyboard();
+                                              Get.to(
+                                                () => PdfViewerScreen(
+                                                  pdfUrl: chat['mediaUrl'],
+                                                ),
+                                              );
+                                            },
+                                            child: Container(
+                                              height: 100,
+                                              width: 200,
+                                              padding: const EdgeInsets.all(10),
+                                              decoration: BoxDecoration(
+                                                border: Border.all(
+                                                    color: Colors.red,
+                                                    width: 2),
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                color: Colors.white,
+                                              ),
+                                              child: const Row(
+                                                children: [
+                                                  Icon(Icons.picture_as_pdf,
+                                                      color: Colors.red,
+                                                      size: 40),
+                                                  SizedBox(width: 10),
+                                                  Expanded(
+                                                    child: Text(
+                                                      "View PDF",
+                                                      style: TextStyle(
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                              ),
+                            );
+                          },
+                        );
+                      } else {
+                        return Container();
+                      }
+                    },
+                  );
+                },
+              )),
+              Obx(
                 () => Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 20,
+                    vertical: 10,
                   ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Obx(
+                        () => Visibility(
+                          visible: controller.isTyping.value,
+                          child: Text(
+                            'is Typing',
+                          ),
+                        ),
+                      ),
                       Container(
                         decoration: BoxDecoration(
                           border: Border.all(
-                            color: controller.isOnline.value
-                                ? Colors.green
-                                : Colors.transparent,
-                            width: controller.isOnline.value ? 2.5 : 0,
+                            color: AppColor.blackColor,
                           ),
-                          shape: BoxShape.circle,
-                        ),
-                        child: extendedImage(
-                          imageUrl: controller.userProfileImage.value,
-                          height: 45,
-                          width: 45,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      Gap(
-                        controller.isOnline.value ? 10 : 7.5,
-                      ),
-                      Column(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '${controller.userFirstName.value} ${controller.userLastName.value}',
+                          borderRadius: BorderRadius.circular(
+                            20,
                           ),
-                          Text(
-                            controller.isOnline.value == true
-                                ? 'Online'
-                                : DateUtilities.userLastActive(
-                                    controller.lastActive.value,
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: InputField(
+                                controller: controller.messageController.value,
+                                hintText: 'Type a message...',
+                                textInputAction: TextInputAction.done,
+                                validator: (value) {},
+                                onChange: (value) {
+                                  controller.messageController.refresh();
+                                  controller.updateTypingStatus(
+                                    isTyping:
+                                        (value ?? '').isNotEmpty ? true : false,
+                                    userId: controller.adminId.value,
+                                  );
+                                },
+                                minLine: 1,
+                                maxLine: 3,
+                                border: InputBorder.none,
+                                disableBorder: InputBorder.none,
+                                enableBorder: InputBorder.none,
+                                focusBorder: InputBorder.none,
+                              ),
+                            ),
+                            Row(
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    openBottomSheet();
+                                  },
+                                  child: const Icon(
+                                    Icons.add,
+                                    color: Colors.grey,
+                                    size: 30,
                                   ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            Expanded(
-                child: StreamBuilder<DocumentSnapshot>(
-              stream: controller.getUserDetails(),
-              builder: (context, userSnapshot) {
-                return StreamBuilder<QuerySnapshot>(
-                  stream: controller.getChat(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-
-                    var chats = snapshot.data?.docs;
-                    if ((chats ?? []).isEmpty) {
-                      return const Center(
-                        child: Text(
-                          "No chats available",
-                        ),
-                      );
-                    }
-                    if (snapshot.hasData) {
-                      return ListView.builder(
-                        itemCount: (chats ?? []).length,
-                        controller: controller.scrollController,
-                        padding: const EdgeInsets.all(10),
-                        itemBuilder: (context, index) {
-                          var chat =
-                              chats?[index].data() as Map<String, dynamic>;
-                          bool isSender = chat['senderId'] == Preference.userId;
-
-                          return Align(
-                            alignment: isSender
-                                ? Alignment.centerRight
-                                : Alignment.centerLeft,
-                            child: Container(
-                              margin: const EdgeInsets.symmetric(
-                                vertical: 5,
-                              ),
-                              padding: chat['messageType'] == 'text'
-                                  ? const EdgeInsets.all(10)
-                                  : const EdgeInsets.all(0),
-                              decoration: chat['messageType'] == 'text'
-                                  ? BoxDecoration(
-                                      color: isSender
+                                ),
+                                const Gap(5),
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                    right: 5,
+                                  ),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      controller.scrollToBottom();
+                                      controller.sendMessage(
+                                        adminId: controller.adminId.value,
+                                        message: controller
+                                            .messageController.value.text,
+                                        userId: controller.userId.value,
+                                      );
+                                    },
+                                    child: Icon(
+                                      Icons.send,
+                                      size: 25,
+                                      color: controller.messageController.value
+                                              .text.isNotEmpty
                                           ? Colors.blue
-                                          : Colors.grey[300],
-                                      borderRadius: BorderRadius.circular(10),
-                                    )
-                                  : BoxDecoration(
-                                      border: Border.all(
-                                        color: Colors.blue,
-                                        width: 2,
-                                      ),
-                                      borderRadius: BorderRadius.circular(10),
+                                          : Colors.grey,
                                     ),
-                              child: chat['messageType'] == 'text'
-                                  ? Text(
-                                      chat['message'] ?? '',
-                                      style: TextStyle(
-                                          color: isSender
-                                              ? Colors.white
-                                              : Colors.black),
-                                    )
-                                  : chat['messageType'] == 'image'
-                                      ? GestureDetector(
-                                          onTap: () {
-                                            closeKeyboard();
-                                            final imageMessages = (chats ?? [])
-                                                .where((e) =>
-                                                    (e.data() as Map<String,
-                                                            dynamic>)[
-                                                        'messageType'] ==
-                                                    'image')
-                                                .toList();
-
-                                            final currentImageIndex =
-                                                imageMessages.indexWhere(
-                                              (e) =>
-                                                  (e.data() as Map<String,
-                                                      dynamic>)['mediaUrl'] ==
-                                                  chat['mediaUrl'],
-                                            );
-
-                                            Get.to(
-                                              () => ImageGalleryView(
-                                                imageUrls: imageMessages
-                                                    .map((e) => (e.data()
-                                                            as Map<String,
-                                                                dynamic>)[
-                                                        'mediaUrl'] as String)
-                                                    .toList(),
-                                                initialIndex: currentImageIndex,
-                                              ),
-                                            );
-                                          },
-                                          child: extendedImage(
-                                            imageUrl: chat['mediaUrl'],
-                                            height: Get.height * 0.2,
-                                            width: Get.width * 0.7,
-                                            fit: BoxFit.fitWidth,
-                                            boxShap: BoxShape.rectangle,
-                                            catchHeight: 2000,
-                                            catchWidth: 2000,
-                                            circularProcessPadding:
-                                                const EdgeInsets.all(
-                                              100,
-                                            ),
-                                            BorderRadius: BorderRadius.circular(
-                                              10,
-                                            ),
-                                          ),
-                                        )
-                                      : GestureDetector(
-                                          onTap: () {
-                                            closeKeyboard();
-                                            Get.to(
-                                              () => PdfViewerScreen(
-                                                pdfUrl: chat['mediaUrl'],
-                                              ),
-                                            );
-                                          },
-                                          child: Container(
-                                            height: 100,
-                                            width: 200,
-                                            padding: const EdgeInsets.all(10),
-                                            decoration: BoxDecoration(
-                                              border: Border.all(
-                                                  color: Colors.red, width: 2),
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                              color: Colors.white,
-                                            ),
-                                            child: const Row(
-                                              children: [
-                                                Icon(Icons.picture_as_pdf,
-                                                    color: Colors.red,
-                                                    size: 40),
-                                                SizedBox(width: 10),
-                                                Expanded(
-                                                  child: Text(
-                                                    "View PDF",
-                                                    style: TextStyle(
-                                                        fontSize: 16,
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
+                                  ),
+                                ),
+                              ],
                             ),
-                          );
-                        },
-                      );
-                    } else {
-                      return Container();
-                    }
-                  },
-                );
-              },
-            )),
-            Obx(
-              () => Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 10,
-                ),
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: AppColor.blackColor,
-                    ),
-                    borderRadius: BorderRadius.circular(
-                      20,
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: InputField(
-                          controller: controller.messageController.value,
-                          hintText: 'Type a message...',
-                          textInputAction: TextInputAction.done,
-                          validator: (value) {},
-                          onChange: (value) {
-                            controller.messageController.refresh();
-                            controller.updateTypingStatus(
-                              isTyping: (value ?? '').isNotEmpty ? true : false,
-                              userId: controller.adminId.value,
-                            );
-                          },
-                          minLine: 1,
-                          maxLine: 3,
-                          border: InputBorder.none,
-                          disableBorder: InputBorder.none,
-                          enableBorder: InputBorder.none,
-                          focusBorder: InputBorder.none,
+                          ],
                         ),
-                      ),
-                      Row(
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              openBottomSheet();
-                            },
-                            child: const Icon(
-                              Icons.add,
-                              color: Colors.grey,
-                              size: 30,
-                            ),
-                          ),
-                          const Gap(5),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                              right: 5,
-                            ),
-                            child: GestureDetector(
-                              onTap: () {
-                                controller.scrollToBottom();
-                                controller.sendMessage(
-                                  adminId: controller.adminId.value,
-                                  message:
-                                      controller.messageController.value.text,
-                                  userId: controller.userId.value,
-                                );
-                              },
-                              child: Icon(
-                                Icons.send,
-                                size: 25,
-                                color: controller
-                                        .messageController.value.text.isNotEmpty
-                                    ? Colors.blue
-                                    : Colors.grey,
-                              ),
-                            ),
-                          ),
-                        ],
                       ),
                     ],
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

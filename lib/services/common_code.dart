@@ -10,11 +10,7 @@ import 'package:field_king_admin/services/toast_message.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
-
-
 final ImagePicker picker = ImagePicker();
-
-
 
 Widget customContainer({
   String? title,
@@ -38,15 +34,15 @@ Widget customContainer({
         child: Text(
           title ?? '',
           style: TextStyle().medium16.textColor(
-            AppColor.blackColor,
-          ),
+                AppColor.blackColor,
+              ),
         ),
       ),
     ),
   );
 }
 
-ExtendedImage extendedImage({
+Widget extendedImage({
   required String imageUrl,
   final double? width,
   final double? height,
@@ -56,52 +52,56 @@ ExtendedImage extendedImage({
   final int? catchHeight,
   final EdgeInsetsGeometry? circularProcessPadding,
   final BorderRadius? BorderRadius,
+  void Function()? onLongPress,
 }) {
-  return ExtendedImage.network(
-    imageUrl,
-    width: width,
-    height: height,
-    fit: fit ?? BoxFit.cover,
-    shape: boxShap ?? BoxShape.circle,
-    cache: true,
-    borderRadius: BorderRadius,
-    mode: ExtendedImageMode.gesture,
-    cacheHeight: catchHeight ?? 300,
-    cacheWidth: catchWidth ?? 300,
-    clearMemoryCacheWhenDispose: true,
-    clearMemoryCacheIfFailed: true,
-    loadStateChanged: (ExtendedImageState state) {
-      switch (state.extendedImageLoadState) {
-        case LoadState.loading:
-          return Padding(
-            padding: circularProcessPadding ??
-                const EdgeInsets.all(
-                  20,
-                ),
-            child: CircularProgressIndicator(
-              color: AppColor.blackColor,
-              strokeWidth: 1,
-            ),
-          );
-        case LoadState.completed:
-          return state.completedWidget;
-        case LoadState.failed:
-          return Image.asset(
-            Assets.defaultProfileImage,
-            width: width,
-            height: height,
-            fit: BoxFit.cover,
-          );
-      }
-    },
+  return GestureDetector(
+    onLongPress: onLongPress,
+    child: ExtendedImage.network(
+      imageUrl,
+      width: width,
+      height: height,
+      fit: fit ?? BoxFit.cover,
+      shape: boxShap ?? BoxShape.circle,
+      cache: true,
+      borderRadius: BorderRadius,
+      mode: ExtendedImageMode.gesture,
+      cacheHeight: catchHeight ?? 300,
+      cacheWidth: catchWidth ?? 300,
+      clearMemoryCacheWhenDispose: true,
+      clearMemoryCacheIfFailed: true,
+      loadStateChanged: (ExtendedImageState state) {
+        switch (state.extendedImageLoadState) {
+          case LoadState.loading:
+            return Padding(
+              padding: circularProcessPadding ??
+                  const EdgeInsets.all(
+                    20,
+                  ),
+              child: CircularProgressIndicator(
+                color: AppColor.blackColor,
+                strokeWidth: 1,
+              ),
+            );
+          case LoadState.completed:
+            return state.completedWidget;
+          case LoadState.failed:
+            return Image.asset(
+              Assets.defaultProfileImage,
+              width: width,
+              height: height,
+              fit: BoxFit.cover,
+            );
+        }
+      },
+    ),
   );
 }
 
 Widget editProfileExtendedImage(
     {String? profileImage,
-      double? width,
-      double? height,
-      File? selectedProfileImage}) {
+    double? width,
+    double? height,
+    File? selectedProfileImage}) {
   if (selectedProfileImage != null) {
     return Container(
       decoration: BoxDecoration(
@@ -133,8 +133,6 @@ Widget editProfileExtendedImage(
   }
 }
 
-
-
 Future pickImage(ImageSource source, {bool? canBack = false}) async {
   XFile? pickedFile = await picker.pickImage(
     source: source,
@@ -150,7 +148,7 @@ Future pickImage(ImageSource source, {bool? canBack = false}) async {
       if (sizeInMB > 5) {
         ToastMessage.getSnackToast(
             message:
-            "File size is too large and can't be uploaded. Allowed maximum size is 5 MB",
+                "File size is too large and can't be uploaded. Allowed maximum size is 5 MB",
             colorText: Colors.white,
             backgroundColor: Colors.red,
             withButton: false);
@@ -160,7 +158,9 @@ Future pickImage(ImageSource source, {bool? canBack = false}) async {
       }
     }
   }
-}Future<double> getImageSizeInMB(String filePath) async {
+}
+
+Future<double> getImageSizeInMB(String filePath) async {
   File imageFile = File(filePath);
   int bytes = await imageFile.length();
   double kilobytes = bytes / 1024;
@@ -195,7 +195,6 @@ Future<CroppedFile?> cropImage(String filePath) async {
   }
   return null;
 }
-
 
 class ContainerDecoration {
   static BoxDecoration decoration({Color? color}) {

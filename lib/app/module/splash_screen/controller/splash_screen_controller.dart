@@ -8,7 +8,6 @@ class SplashScreenController extends GetxController {
   void onInit() {
     super.onInit();
     callOnboardingScreen();
-    updateUserActiveStatus();
     startUpFunction();
   }
 
@@ -26,12 +25,6 @@ class SplashScreenController extends GetxController {
                 Routes.login,
               );
       },
-    );
-  }
-
-  updateUserActiveStatus() async {
-    await FirebaseFirestoreService.updateUserActiveStatus(
-      userId: Preference.userId,
     );
   }
 
