@@ -11,7 +11,8 @@ abstract class Routes {
   static const tabBarView = _Paths.tabBarView;
   static const orderDetailsView = _Paths.orderDetailsView;
   static const chatScreenView = _Paths.chatScreenView;
-
+  static const userListView = _Paths.userListView;
+  static const userDetailsView = _Paths.userDetailsView;
 }
 
 abstract class _Paths {
@@ -25,5 +26,6 @@ abstract class _Paths {
   static const tabBarView = '/tab-bar-view';
   static const orderDetailsView = '/order-details-view';
   static const chatScreenView = '/chat-screen-view';
-
+  static const userListView = '/user-list-view';
+  static const userDetailsView = '/user-details-view';
 }

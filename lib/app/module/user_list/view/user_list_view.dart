@@ -1,52 +1,31 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:field_king_admin/app/module/chat/controller/chat_controller.dart';
-import 'package:field_king_admin/app/module/tab_bar/controller/tab_bar_controller.dart';
+import 'package:field_king_admin/app/module/user_list/controller/user_list_controller.dart';
 import 'package:field_king_admin/packages/config.dart';
 import 'package:field_king_admin/packages/screen.dart';
 import 'package:field_king_admin/services/app_color/app_colors.dart';
-import 'package:field_king_admin/services/app_icon.dart';
 import 'package:field_king_admin/services/common_code.dart';
 import 'package:field_king_admin/services/custom_app_bar.dart';
 import 'package:field_king_admin/services/date_utils.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:field_king_admin/services/firebase_services.dart';
 import 'package:gap/gap.dart';
 
-class ChatView extends StatelessWidget {
-  ChatView({super.key});
+class UserListView extends StatelessWidget {
+  UserListView({super.key});
 
-  final controller = Get.put(ChatController());
+  final controller = Get.put(UserListController());
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColor.whiteColor,
       appBar: CustomAppBar(
-        leadingWidget: Padding(
-          padding: const EdgeInsets.all(
-            8,
-          ),
-          child: GestureDetector(
-            onTap: () {
-              Get.find<TabBarController>().tabBarKey.currentState?.openDrawer();
-            },
-            child: SvgPicture.asset(
-              Assets.drawerIcon,
-              width: 15,
-              height: 15,
-              colorFilter: ColorFilter.mode(
-                AppColor.blackColor,
-                BlendMode.srcIn,
-              ),
-            ),
-          ),
-        ),
         title: Text(
-          'Chat',
+          'User List',
         ),
-        isLeading: false,
+        isLeading: true,
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: controller.getUserList(),
+        stream: FirebaseFirestoreService.getUserList(),
         builder: (context, snapshot) {
           var user = snapshot.data?.docs;
           return ListView.builder(
@@ -55,7 +34,7 @@ class ChatView extends StatelessWidget {
               return GestureDetector(
                 onTap: () {
                   Get.toNamed(
-                    Routes.chatScreenView,
+                    Routes.userDetailsView,
                     arguments: {
                       'userId': user?[index]['userId'],
                     },
@@ -72,7 +51,6 @@ class ChatView extends StatelessWidget {
                           horizontal: 20,
                           vertical: 10,
                         ),
-                        // decoration: ContainerDecoration.decoration(),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [

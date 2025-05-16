@@ -1,12 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:field_king_admin/app/module/order_list/controller/order_list_controller.dart';
+import 'package:field_king_admin/app/module/tab_bar/controller/tab_bar_controller.dart';
 import 'package:field_king_admin/packages/config.dart';
 import 'package:field_king_admin/packages/screen.dart';
 import 'package:field_king_admin/services/app_button.dart';
 import 'package:field_king_admin/services/app_color/app_colors.dart';
+import 'package:field_king_admin/services/app_icon.dart';
 import 'package:field_king_admin/services/common_code.dart';
 import 'package:field_king_admin/services/custom_app_bar.dart';
 import 'package:field_king_admin/services/date_utils.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
 
 class OrderListView extends StatelessWidget {
@@ -19,6 +22,25 @@ class OrderListView extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColor.whiteColor,
       appBar: CustomAppBar(
+        leadingWidget: Padding(
+          padding: const EdgeInsets.all(
+            8,
+          ),
+          child: GestureDetector(
+            onTap: () {
+              Get.find<TabBarController>().tabBarKey.currentState?.openDrawer();
+            },
+            child: SvgPicture.asset(
+              Assets.drawerIcon,
+              width: 15,
+              height: 15,
+              colorFilter: ColorFilter.mode(
+                AppColor.blackColor,
+                BlendMode.srcIn,
+              ),
+            ),
+          ),
+        ),
         title: Text(
           'Order List',
         ),

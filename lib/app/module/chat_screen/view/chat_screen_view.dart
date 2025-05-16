@@ -180,20 +180,24 @@ class _ChatScreenViewState extends State<ChatScreenView>
                                         decoration: BoxDecoration(
                                           color: Colors.blue,
                                           borderRadius: BorderRadius.only(
-                                            bottomLeft: Radius.circular(10),
+                                            bottomLeft: Radius.circular(
+                                              isSender ? 10 : 0,
+                                            ),
                                             bottomRight: Radius.circular(
                                               isSender ? 0 : 10,
                                             ),
-                                            topLeft: Radius.circular(10),
-                                            topRight: Radius.circular(10),
+                                            topLeft: Radius.circular(
+                                              10,
+                                            ),
+                                            topRight: Radius.circular(
+                                              10,
+                                            ),
                                           ),
                                         ),
                                         child: Text(
                                           chat['message'] ?? '',
                                           style: TextStyle(
-                                            color: isSender
-                                                ? Colors.white
-                                                : Colors.black,
+                                            color: Colors.white,
                                           ),
                                         ),
                                       )
@@ -316,13 +320,13 @@ class _ChatScreenViewState extends State<ChatScreenView>
                                               );
                                             },
                                             child: Container(
-                                              height: 100,
                                               width: 200,
-                                              padding: const EdgeInsets.all(10),
+                                              padding: const EdgeInsets.all(
+                                                10,
+                                              ),
                                               decoration: BoxDecoration(
                                                 border: Border.all(
-                                                  color: Colors.red,
-                                                  width: 2,
+                                                  color: AppColor.blackColor,
                                                 ),
                                                 borderRadius: BorderRadius.only(
                                                   topLeft: Radius.circular(
@@ -350,9 +354,10 @@ class _ChatScreenViewState extends State<ChatScreenView>
                                                     child: Text(
                                                       "View PDF",
                                                       style: TextStyle(
-                                                          fontSize: 16,
-                                                          fontWeight:
-                                                              FontWeight.bold),
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
                                                     ),
                                                   ),
                                                 ],
@@ -385,7 +390,7 @@ class _ChatScreenViewState extends State<ChatScreenView>
                         left: 20,
                         right: 20,
                         bottom: 10,
-                        top: 0,
+                        top: 5,
                       ),
                       child: Container(
                         decoration: BoxDecoration(

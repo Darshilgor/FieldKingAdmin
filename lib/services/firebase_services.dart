@@ -397,4 +397,8 @@ class FirebaseFirestoreService {
       GeneralController.isShowWithOutGst.value = false;
     }
   }
+
+  static Future<DocumentSnapshot> getUserDetails({String? userId}) async {
+    return await firebaseFirestore.collection('Users').doc(userId).get();
+  }
 }

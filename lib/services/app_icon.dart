@@ -22,4 +22,5 @@ class Assets {
   static const String drawerIcon = '$iconBaseUrl/drawer_icon.svg';
   static const String defaultProfileImage =
       '$imageBaseUrl/default_profile_image.png';
+
 }

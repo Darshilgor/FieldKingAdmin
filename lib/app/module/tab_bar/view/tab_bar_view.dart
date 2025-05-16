@@ -28,12 +28,12 @@ class TabBarView extends StatelessWidget {
         () => Scaffold(
           key: controller.tabBarKey,
           extendBody: true,
-          // drawer: _buildDrawer(context),
+          drawer: _buildDrawer(context),
           body: IndexedStack(
             index: controller.currentIndex.value,
             children: [
-              OrderListView(),
               HomeScreenView(),
+              OrderListView(),
               ChatView(),
               ProfileView(),
             ],
@@ -77,7 +77,7 @@ class TabBarView extends StatelessWidget {
                           top: 10,
                         ),
                         child: Text(
-                          'Order List',
+                          'Home',
                           style: controller.currentIndex.value == 0
                               ? TextStyle().semiBold18.textColor(
                                     AppColor.blackColor,
@@ -118,7 +118,7 @@ class TabBarView extends StatelessWidget {
                           top: 10,
                         ),
                         child: Text(
-                          'Home',
+                          'Order List',
                           style: controller.currentIndex.value == 1
                               ? TextStyle().semiBold18.textColor(
                                     AppColor.blackColor,
@@ -327,4 +327,51 @@ class TabBarView extends StatelessWidget {
       ),
     );
   }*/
+  Theme _buildDrawer(BuildContext context) {
+    return Theme(
+      data: ThemeData(useMaterial3: false),
+      child: Drawer(
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.zero,
+        ),
+        child: Column(
+          children: <Widget>[
+            Container(
+              height: Get.height * 0.2,
+              decoration: BoxDecoration(
+                color: AppColor.whiteColor,
+                boxShadow: [
+                  BoxShadow(
+                    blurRadius: 10,
+                    spreadRadius: 2,
+                    color: Colors.grey.withOpacity(
+                      0.3,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Gap(20),
+            GestureDetector(
+              onTap: () {
+                Get.back();
+                Get.toNamed(
+                  Routes.userListView,
+                )?.then((value) {
+                  controller.currentIndex.value = 0;
+                });
+              },
+              child: Text(
+                'User List',
+                style: TextStyle(
+                  fontSize: 18,
+                  color: AppColor.blackColor,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
