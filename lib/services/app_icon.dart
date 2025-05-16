@@ -1,6 +1,8 @@
 class Assets {
   static const String iconBaseUrl = 'assets/images/icons';
   static const String imageBaseUrl = 'assets/images/images';
+  static const String lottieFilePath = 'assets/lottie/';
+  static const String typingJson = '${lottieFilePath}typing.json';
 
   static const String phoneIcon = '$iconBaseUrl/phone_icon.svg';
   static const String reSendIcon = '$iconBaseUrl/resend_icon.svg';

@@ -13,6 +13,7 @@ import 'package:field_king_admin/services/custom_app_bar.dart';
 import 'package:field_king_admin/services/date_utils.dart';
 import 'package:field_king_admin/services/show_loader.dart';
 import 'package:field_king_admin/services/text_form_field.dart';
+import 'package:field_king_admin/services/typing_lottie_file.dart';
 import 'package:gap/gap.dart';
 
 class ChatScreenView extends StatefulWidget {
@@ -139,6 +140,12 @@ class _ChatScreenViewState extends State<ChatScreenView>
                         );
                       }
                       if (snapshot.hasData) {
+                        WidgetsBinding.instance.addPostFrameCallback(
+                          (_) {
+                            controller.scrollToBottom();
+                          },
+                        );
+
                         return ListView.builder(
                           itemCount: (chats ?? []).length,
                           controller: controller.scrollController,
@@ -158,68 +165,37 @@ class _ChatScreenViewState extends State<ChatScreenView>
                                   ? Alignment.centerRight
                                   : Alignment.centerLeft,
                               child: Container(
-                                margin: const EdgeInsets.symmetric(
-                                  vertical: 5,
+                                margin: EdgeInsets.only(
+                                  top: 5,
+                                  bottom: 5,
+                                  left: isSender ? 50 : 10,
+                                  right: isSender ? 10 : 50,
                                 ),
-                                padding: chat['messageType'] == 'text'
-                                    ? const EdgeInsets.all(10)
-                                    : const EdgeInsets.all(0),
-                                decoration: chat['messageType'] == 'text'
-                                    ? BoxDecoration(
-                                        color: isSender
-                                            ? Colors.blue
-                                            : Colors.grey[300],
-                                        borderRadius: BorderRadius.circular(10),
-                                      )
-                                    : BoxDecoration(
-                                        border: Border.all(
-                                          color: Colors.blue,
-                                          width: 2,
-                                        ),
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
                                 child: chat['messageType'] == 'text'
-                                    ? Stack(
-                                        children: [
-                                          GestureDetector(
-                                            onLongPress: () {
-                                              controller.isShowDeleteButton
-                                                      .value =
-                                                  !controller
-                                                      .isShowDeleteButton.value;
-                                            },
-                                            onTap: () {
-                                              controller.selectedMessageId
-                                                  .value = chat['id'];
-                                            },
-                                            child: Text(
-                                              chat['message'] ?? '',
-                                              style: TextStyle(
-                                                color: isSender
-                                                    ? Colors.white
-                                                    : Colors.black,
-                                              ),
+                                    ? Container(
+                                        padding: EdgeInsets.symmetric(
+                                          vertical: 10,
+                                          horizontal: 10,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.blue,
+                                          borderRadius: BorderRadius.only(
+                                            bottomLeft: Radius.circular(10),
+                                            bottomRight: Radius.circular(
+                                              isSender ? 0 : 10,
                                             ),
+                                            topLeft: Radius.circular(10),
+                                            topRight: Radius.circular(10),
                                           ),
-                                          if (isSelected)
-                                            Positioned(
-                                              top: -10,
-                                              right: -10,
-                                              child: IconButton(
-                                                icon: const Icon(Icons.delete,
-                                                    color: Colors.red,
-                                                    size: 20),
-                                                onPressed: () {
-                                                  // controller.deleteMessage(
-                                                  //     chat['messageId']);
-                                                  // controller.isShowDeleteButton
-                                                  //     .value = false;
-                                                  // controller.selectedMessageId
-                                                  //     .value = '';
-                                                },
-                                              ),
-                                            ),
-                                        ],
+                                        ),
+                                        child: Text(
+                                          chat['message'] ?? '',
+                                          style: TextStyle(
+                                            color: isSender
+                                                ? Colors.white
+                                                : Colors.black,
+                                          ),
+                                        ),
                                       )
                                     : chat['messageType'] == 'image'
                                         ? GestureDetector(
@@ -256,28 +232,59 @@ class _ChatScreenViewState extends State<ChatScreenView>
                                                 ),
                                               );
                                             },
-                                            child: extendedImage(
-                                              onLongPress: () {
-                                                controller.isShowDeleteButton
-                                                        .value =
-                                                    !controller
-                                                        .isShowDeleteButton
-                                                        .value;
-                                              },
-                                              imageUrl: chat['mediaUrl'],
-                                              height: Get.height * 0.2,
-                                              width: Get.width * 0.7,
-                                              fit: BoxFit.fitWidth,
-                                              boxShap: BoxShape.rectangle,
-                                              catchHeight: 2000,
-                                              catchWidth: 2000,
-                                              circularProcessPadding:
-                                                  const EdgeInsets.all(
-                                                100,
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.only(
+                                                  topLeft: Radius.circular(
+                                                    10,
+                                                  ),
+                                                  topRight: Radius.circular(
+                                                    10,
+                                                  ),
+                                                  bottomLeft: Radius.circular(
+                                                    isSender ? 10 : 0,
+                                                  ),
+                                                  bottomRight: Radius.circular(
+                                                    isSender ? 0 : 10,
+                                                  ),
+                                                ),
+                                                border: Border.all(
+                                                  color: AppColor.blackColor,
+                                                ),
                                               ),
-                                              BorderRadius:
-                                                  BorderRadius.circular(
-                                                10,
+                                              child: extendedImage(
+                                                onLongPress: () {
+                                                  controller.isShowDeleteButton
+                                                          .value =
+                                                      !controller
+                                                          .isShowDeleteButton
+                                                          .value;
+                                                },
+                                                imageUrl: chat['mediaUrl'],
+                                                height: Get.height * 0.2,
+                                                width: Get.width * 0.7,
+                                                fit: BoxFit.fitWidth,
+                                                boxShap: BoxShape.rectangle,
+                                                catchHeight: 2000,
+                                                catchWidth: 2000,
+                                                circularProcessPadding:
+                                                    const EdgeInsets.all(
+                                                  100,
+                                                ),
+                                                BorderRadius: BorderRadius.only(
+                                                  topRight: Radius.circular(
+                                                    9,
+                                                  ),
+                                                  topLeft: Radius.circular(
+                                                    9,
+                                                  ),
+                                                  bottomLeft: Radius.circular(
+                                                    isSender ? 9 : 0,
+                                                  ),
+                                                  bottomRight: Radius.circular(
+                                                    isSender ? 0 : 9,
+                                                  ),
+                                                ),
                                               ),
                                             ),
                                           )
@@ -314,10 +321,23 @@ class _ChatScreenViewState extends State<ChatScreenView>
                                               padding: const EdgeInsets.all(10),
                                               decoration: BoxDecoration(
                                                 border: Border.all(
-                                                    color: Colors.red,
-                                                    width: 2),
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
+                                                  color: Colors.red,
+                                                  width: 2,
+                                                ),
+                                                borderRadius: BorderRadius.only(
+                                                  topLeft: Radius.circular(
+                                                    10,
+                                                  ),
+                                                  topRight: Radius.circular(
+                                                    10,
+                                                  ),
+                                                  bottomLeft: Radius.circular(
+                                                    isSender ? 10 : 0,
+                                                  ),
+                                                  bottomRight: Radius.circular(
+                                                    isSender ? 0 : 10,
+                                                  ),
+                                                ),
                                                 color: Colors.white,
                                               ),
                                               child: const Row(
@@ -351,23 +371,23 @@ class _ChatScreenViewState extends State<ChatScreenView>
                 },
               )),
               Obx(
-                () => Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 10,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Obx(
-                        () => Visibility(
-                          visible: controller.isTyping.value,
-                          child: Text(
-                            'is Typing',
-                          ),
-                        ),
+                () => Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Obx(
+                      () => Visibility(
+                        visible: controller.isTyping.value,
+                        child: const TypingIndicator(),
                       ),
-                      Container(
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        left: 20,
+                        right: 20,
+                        bottom: 10,
+                        top: 0,
+                      ),
+                      child: Container(
                         decoration: BoxDecoration(
                           border: Border.all(
                             color: AppColor.blackColor,
@@ -442,8 +462,8 @@ class _ChatScreenViewState extends State<ChatScreenView>
                           ],
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ],

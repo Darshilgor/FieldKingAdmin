@@ -50,7 +50,7 @@ class ChatScreenController extends GetxController {
     );
   }
 
-  scrollToBottom() {
+/*  scrollToBottom() {
     Future.delayed(
       Duration(milliseconds: 100),
       () {
@@ -61,6 +61,15 @@ class ChatScreenController extends GetxController {
         );
       },
     );
+  }*/
+  void scrollToBottom() {
+    if (scrollController.hasClients) {
+      scrollController.animateTo(
+        scrollController.position.maxScrollExtent + 350,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
   }
 
   initialMessage({String? adminId, String? userId, String? message}) async {
