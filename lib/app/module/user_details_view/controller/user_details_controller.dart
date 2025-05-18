@@ -4,6 +4,7 @@ import 'package:field_king_admin/services/firebase_services.dart';
 
 class UserDetailsController extends GetxController {
   RxString userId = RxString('');
+  Rx<Map<String, dynamic>?> user = Rx<Map<String, dynamic>?>(null);
 
   @override
   void onInit() {
@@ -19,11 +20,9 @@ class UserDetailsController extends GetxController {
     }
   }
 
-  getUserDetails() {
-    FirebaseFirestoreService.getUserDetails(
-      userId: userId.value,
-    ).then((value) {
-      print('User details is ${value.data()}');
-    });
+  void getUserDetails() async {
+    final doc =
+        await FirebaseFirestoreService.getUserDetails(userId: userId.value);
+    user.value = doc.data() as Map<String, dynamic>?;
   }
 }

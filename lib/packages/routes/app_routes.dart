@@ -13,6 +13,8 @@ abstract class Routes {
   static const chatScreenView = _Paths.chatScreenView;
   static const userListView = _Paths.userListView;
   static const userDetailsView = _Paths.userDetailsView;
+  static const userOrderHistoryView = _Paths.userOrderHistoryView;
+  static const userOrderhistoryDetailsView = _Paths.userOrderhistoryDetailsView;
 }
 
 abstract class _Paths {
@@ -28,4 +30,6 @@ abstract class _Paths {
   static const chatScreenView = '/chat-screen-view';
   static const userListView = '/user-list-view';
   static const userDetailsView = '/user-details-view';
+  static const userOrderHistoryView = '/user-order-history-view';
+  static const userOrderhistoryDetailsView = '/user-order-history-details-view';
 }

@@ -8,6 +8,8 @@ import 'package:field_king_admin/app/module/splash_screen/view/splash_screen_vie
 import 'package:field_king_admin/app/module/tab_bar/view/tab_bar_view.dart';
 import 'package:field_king_admin/app/module/user_details_view/view/user_details_view.dart';
 import 'package:field_king_admin/app/module/user_list/view/user_list_view.dart';
+import 'package:field_king_admin/app/module/user_order_history/view/user_order_history_view.dart';
+import 'package:field_king_admin/app/module/user_order_history_details/view/user_order_history_detailss_view.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
 
 part 'app_routes.dart';
@@ -48,6 +50,12 @@ class AppPages {
     ),GetPage(
       name: _Paths.userDetailsView,
       page: () => UserDetailsView(),
+    ),GetPage(
+      name: _Paths.userOrderHistoryView,
+      page: () => UserOrderHistoryView(),
+    ),GetPage(
+      name: _Paths.userOrderhistoryDetailsView,
+      page: () => UserOrderHistoryDetailssView(),
     ),
   ];
 }

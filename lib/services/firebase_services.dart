@@ -401,4 +401,30 @@ class FirebaseFirestoreService {
   static Future<DocumentSnapshot> getUserDetails({String? userId}) async {
     return await firebaseFirestore.collection('Users').doc(userId).get();
   }
+
+  static Future<QuerySnapshot> getUserOrderList({String? userId}) {
+    return firebaseFirestore
+        .collection('Users')
+        .doc(userId)
+        .collection('Order')
+        .orderBy(
+          'createdAt',
+          descending: true,
+        )
+        .get();
+  }
+
+  static updatePaymentStatus(
+      {String? userId, String? orderId, bool? status}) async {
+    await firebaseFirestore
+        .collection('Users')
+        .doc(userId)
+        .collection('Order')
+        .doc(orderId)
+        .update(
+      {
+        'paymentStatus': status,
+      },
+    );
+  }
 }
