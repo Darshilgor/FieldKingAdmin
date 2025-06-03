@@ -1,8 +1,14 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:field_king_admin/app/model/get_product_model.dart';
 import 'package:field_king_admin/services/genera_controller.dart';
 import 'package:field_king_admin/services/get_storage/get_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
+import 'package:googleapis_auth/auth_io.dart';
+import 'package:googleapis_auth/googleapis_auth.dart';
+import 'package:http/http.dart' as http;
 
 class FirebaseAuthServices {
   final FirebaseAuth auth = FirebaseAuth.instance;
@@ -336,6 +342,23 @@ class FirebaseFirestoreService {
         'id': document.id,
       },
     );
+    DocumentSnapshot userNotificationSnapshot =
+        await firebaseFirestore.collection('Users').doc(userId).get();
+
+    var user = userNotificationSnapshot.data() as Map<String, dynamic>?;
+
+    // if (user?['isOnline'] == false) {
+    /*sendPushNotification(
+        token: user?['deviceId'],
+        body: 'notification body is',
+        title: 'notification title is',
+      );*/
+    sendFCMNotification(
+        title: 'notification title',
+        body: 'notification body',
+        userFcmToken:
+            'dTKSI76MThqjMrJ0p-YppQ:APA91bFv1xQO4Nk2m6ZExROVxWbPySEiVs3V-23k_jswTejrXpwx6SEzeb_BuKThrVueBwhjWeKvajDWOEAaLqHjiFXTE_bh7tO69NDor3Ztm613UaqnBCs');
+    // }
   }
 
   static updateIsTypingStatus({bool? isTyping, String? userId}) async {
@@ -426,5 +449,105 @@ class FirebaseFirestoreService {
         'paymentStatus': status,
       },
     );
+  }
+
+  /*static const String serverKey =
+      "AAAAQpaz38E:APA91bFNslLR_Im-MJL8kOqCc9wK3rnajD9rURZaXZAaq-VA-YCj_JQHfW8eaRlUlCM8g_bDXgSiPlbWJW_SM9buSK08Ed4l_9vEc1e5DQsYtybSb_iCjSHhwO8U7n79708It_6QsqJX";
+
+  static Future<void> sendPushNotification({
+    String? token,
+    String? title,
+    String? body,
+  }) async {
+    try {
+      final url = Uri.parse("https://fcm.googleapis.com/fcm/send");
+
+      final headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'key=$serverKey',
+      };
+
+      final payload = {
+        'to':
+            'fOhitfDxSDy09oGXz0n6xL:APA91bEmfjV6M6xLQO0KOJATd5sMD9P2UDcI1eN6K1hfYAYaoG5QJYQ6wQbCTcOcSo6v7B9604GV6mxihuvxKFzsZWisZCNViWbjNaa-b_IecOvoF-aZFPw',
+        'notification': {
+          'title': title,
+          'body': body,
+        },
+        'data': {
+          'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+          'status': 'done',
+        },
+      };
+
+      final response = await http.post(
+        url,
+        headers: headers,
+        body: jsonEncode(payload),
+      );
+
+      print(response.body);
+      print(headers);
+      print('payload $payload');
+
+      if (response.statusCode == 200) {
+        print('✅ Notification sent');
+      } else {
+        print('❌ Failed to send notification: ${response.statusCode}');
+        print(headers);
+      }
+    } catch (e) {
+      print('catche error $e');
+    }
+  }*/
+  static Future<void> sendFCMNotification({
+    String? userFcmToken,
+    String? title,
+    String? body,
+  }) async {
+    const String projectId =
+        'field-king-515db'; // <-- Replace with your Firebase project ID
+
+    final jsonString = await rootBundle.loadString(
+        'assets/field-king-515db-firebase-adminsdk-ucrd7-36f5b4c6ea.json');
+    final credentials = ServiceAccountCredentials.fromJson(jsonString);
+
+    final scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
+
+    final client = await clientViaServiceAccount(credentials, scopes);
+
+    final url = Uri.parse(
+        'https://fcm.googleapis.com/v1/projects/$projectId/messages:send');
+
+    final message = {
+      "message": {
+        "token": userFcmToken,
+        "notification": {
+          "title": title,
+          "body": body,
+        },
+        "android": {
+          "priority": "high",
+        },
+        "apns": {
+          "headers": {"apns-priority": "10"}
+        }
+      }
+    };
+
+    final response = await client.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(message),
+    );
+
+    if (response.statusCode == 200) {
+      print('✅ Notification sent: ${response.body}');
+    } else {
+      print('❌ Error: ${response.statusCode}');
+      print('Response: ${response.body}');
+    }
+
+    client.close();
   }
 }
