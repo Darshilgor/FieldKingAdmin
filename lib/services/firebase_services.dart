@@ -374,12 +374,14 @@ class FirebaseFirestoreService {
     String? userId,
     bool? online,
   }) async {
-    await firebaseFirestore.collection('Users').doc(userId).update(
-      {
-        'isOnline': online,
-        'lastActive': FieldValue.serverTimestamp(),
-      },
-    );
+    if ((userId ?? '').isNotEmpty && userId != '') {
+      await firebaseFirestore.collection('Users').doc(userId).update(
+        {
+          'isOnline': online,
+          'lastActive': FieldValue.serverTimestamp(),
+        },
+      );
+    }
   }
 
   static Stream<QuerySnapshot> getChatUserDetails({
@@ -549,5 +551,32 @@ class FirebaseFirestoreService {
     }
 
     client.close();
+  }
+
+  static Future<bool> checkUserExitsOrNot({
+    String? phoneNo,
+  }) async {
+    try {
+      final querySnapshot = await firebaseFirestore
+          .collection('Users')
+          .where('phoneNo', isEqualTo: phoneNo)
+          .limit(1)
+          .get();
+
+      Map<String, dynamic> user = querySnapshot.docs.first.data();
+
+      Preference.brandName = user['brandName'];
+      Preference.firstName = user['firstName'];
+      Preference.lastName = user['lastName'];
+      Preference.phoneNumber = user['phoneNo'];
+      Preference.address = user['address'];
+      Preference.profileImage = user['profilePhoto'];
+
+      Preference.userType = 'Admin';
+      Preference.isLogin = true;
+      return querySnapshot.docs.isNotEmpty;
+    } catch (e) {
+      return false;
+    }
   }
 }

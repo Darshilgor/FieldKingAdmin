@@ -92,10 +92,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   Future<void> updateUserStatus({bool? isOnline}) async {
     String? userId = Preference.userId;
-    await FirebaseFirestoreService.updateUserActiveStatus(
-      userId: userId,
-      online: isOnline,
-    );
+      await FirebaseFirestoreService.updateUserActiveStatus(
+        userId: userId,
+        online: isOnline,
+      );
   }
 }
 

@@ -35,7 +35,11 @@ class DateUtilities {
     return DateFormat('dd/MM/yyyy').format(dateTime);
   }
 
-  static String userLastActive(Timestamp timestamp) {
+  static String userLastActive(dynamic timestamp) {
+    if (timestamp == null || timestamp is! Timestamp) {
+      return "Offline";
+    }
+
     DateTime date = timestamp.toDate();
     DateTime now = DateTime.now();
     Duration diff = now.difference(date);
@@ -46,8 +50,9 @@ class DateUtilities {
       return "${diff.inMinutes} min ago";
     }
 
-    bool isToday =
-        now.day == date.day && now.month == date.month && now.year == date.year;
+    bool isToday = now.day == date.day &&
+        now.month == date.month &&
+        now.year == date.year;
 
     bool isYesterday = now.subtract(Duration(days: 1)).day == date.day &&
         now.subtract(Duration(days: 1)).month == date.month &&
@@ -64,4 +69,5 @@ class DateUtilities {
       return "${dateFormat.format(date)} at ${timeFormat.format(date)}";
     }
   }
+
 }

@@ -1,5 +1,6 @@
 import 'package:field_king_admin/packages/screen.dart';
 import 'package:field_king_admin/services/app_color/app_colors.dart';
+import 'package:field_king_admin/services/close_keyboard.dart';
 import 'package:field_king_admin/services/text_style/text_style.dart';
 import 'package:pinput/pinput.dart';
 
@@ -23,8 +24,8 @@ Widget otpWidget({
       width: 70,
       height: 56,
       textStyle: const TextStyle().regular20.textColor(
-        AppColor.errorColor,
-      ),
+            AppColor.errorColor,
+          ),
       decoration: BoxDecoration(
         color: AppColor.whiteColor,
         border: Border.all(
@@ -38,8 +39,8 @@ Widget otpWidget({
       width: 70,
       height: 56,
       textStyle: TextStyle().regular20.textColor(
-        AppColor.blackColor,
-      ),
+            AppColor.blackColor,
+          ),
       decoration: BoxDecoration(
         color: AppColor.whiteColor,
         border: Border.all(
@@ -53,8 +54,8 @@ Widget otpWidget({
       width: 70,
       height: 56,
       textStyle: TextStyle().regular20.textColor(
-        AppColor.blackColor,
-      ),
+            AppColor.blackColor,
+          ),
       decoration: BoxDecoration(
         color: AppColor.whiteColor,
         border: Border.all(
@@ -70,8 +71,8 @@ Widget otpWidget({
       width: 70,
       height: 56,
       textStyle: TextStyle().regular20.textColor(
-        AppColor.blackColor,
-      ),
+            AppColor.blackColor,
+          ),
       decoration: BoxDecoration(
         color: AppColor.whiteColor,
         border: Border.all(
@@ -91,7 +92,7 @@ Widget otpWidget({
     length: 6,
     onChanged: onChanged,
     onCompleted: (value) {
-      FocusScope.of(context).unfocus();
+      closeKeyboard();
     },
   );
 }

@@ -3,8 +3,7 @@ import 'package:field_king_admin/packages/screen.dart';
 import 'package:field_king_admin/services/firebase_services.dart';
 import 'package:field_king_admin/services/toast_message.dart';
 
-class LoginController extends GetxController
-{
+class LoginController extends GetxController {
   final loginFormKey = GlobalKey<FormState>();
 
   Rx<TextEditingController> phoneNoController = TextEditingController().obs;
@@ -14,23 +13,29 @@ class LoginController extends GetxController
   RxBool isTimerOut = RxBool(false);
   var endTime = Rx<DateTime?>(null);
 
-
   verifyOtpFunction({String? verificationId}) {
     FirebaseAuthServices.verifyOTP(
       verificationId: verificationId ?? '',
       otp: pinPutController.value.text,
-      onVerified: (value) {
+      onVerified: (value) async {
         isVerifyOtpBtnLoad.value = false;
         isVerifyOtpBtnLoad.refresh();
         Preference.isOtpVerified = true;
         Preference.phoneNumber = phoneNoController.value.text;
         Get.back();
-        Get.offAllNamed(
-          Routes.signUp,
-          arguments: {
-            'phoneNo': phoneNoController,
-          },
+        bool isUserExits = await FirebaseFirestoreService.checkUserExitsOrNot(
+          phoneNo: phoneNoController.value.text,
         );
+        if (isUserExits == true) {
+          Get.toNamed(Routes.tabBarView);
+        } else {
+          Get.offAllNamed(
+            Routes.signUp,
+            arguments: {
+              'phoneNo': phoneNoController,
+            },
+          );
+        }
       },
       onError: (e) {
         isVerifyOtpBtnLoad.value = false;
@@ -41,6 +46,7 @@ class LoginController extends GetxController
       },
     );
   }
+
   sendOtpFunction({
     BuildContext? context,
     required Function(String) onCodeSentFunction,
